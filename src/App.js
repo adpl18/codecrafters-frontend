@@ -5,7 +5,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <p>
-          Grupo codecrafters 2024-1 - Proyecto profesores 
+          Grupo codecrafters 2024-1 - Test ci/cd
         </p>
       </header>
     </div>

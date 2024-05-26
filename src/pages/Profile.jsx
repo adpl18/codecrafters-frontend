@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { logout } from '../auth/authService';
 import { useHistory } from 'react-router-dom';
-import Login from './Login';
+import Login from '../components/Login';
 
 const Profile = () => {
   const { userInfo, isAuthenticated } = useAuth();
@@ -17,7 +17,7 @@ const Profile = () => {
   return (
     <div className="profile">
       <h1>User Profile</h1>
-      <p>This is the user's profile page.</p>
+      <p>This is the users profile page.</p>
       
       {isAuthenticated && userInfo ? (
         <div>

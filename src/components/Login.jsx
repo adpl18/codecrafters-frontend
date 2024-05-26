@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { signIn, signUp, forgotPassword, resetPassword } from '../auth/authService';
 
 const Login = () => {
@@ -10,7 +10,7 @@ const Login = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [code, setCode] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -20,7 +20,7 @@ const Login = () => {
       if (session && typeof session.AccessToken !== 'undefined') {
         sessionStorage.setItem('accessToken', session.AccessToken);
         if (sessionStorage.getItem('accessToken')) {
-          history.push('/');
+          navigate('/');
         } else {
           console.error('Session token was not set properly.');
         }
@@ -40,7 +40,7 @@ const Login = () => {
     }
     try {
       await signUp(email, password);
-      history.push('/');
+      navigate('/');
     } catch (error) {
       alert(`Sign up failed: ${error}`);
     }

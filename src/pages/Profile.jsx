@@ -2,16 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { logout } from '../auth/authService';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Login from '../components/Login';
 
 const Profile = () => {
   const { userInfo, isAuthenticated } = useAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    history.push("/");
+    navigate("/");
   };
 
   return (

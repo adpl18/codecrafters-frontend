@@ -1,17 +1,15 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 
-const Routes = () => {
+const AppRoutes = () => {
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/" component={Home} />
-        <Route path="/profile" component={Profile} />
-      </Switch>
-    </Router>
+    <Routes>
+      <Route exact path="/" element={<Home />} />
+      <Route path="/profile" element={<Profile />} />
+    </Routes>
   );
 };
 
-export default Routes;
+export default AppRoutes;

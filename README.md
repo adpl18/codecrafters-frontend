@@ -1,1 +1,3 @@
 # codecrafters-frontend
+
+hacer .env

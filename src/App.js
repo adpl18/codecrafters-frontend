@@ -1,13 +1,25 @@
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import Navbar from './layouts/Navbar';
+import Footer from './layouts/Footer';
+import ProjectRoutes from './Routes'; // Import your routes from Routes.js
+import "./assets/css/App.css";
+import backgroundImage from './assets/images/bola-color.png'; 
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Grupo codecrafters 2024-1 - Test ci/cd en vivo
-        </p>
-      </header>
+    <div className="App flex flex-col min-h-screen" style={{ 
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat'
+    }}>
+      <Router>
+        <div className="flex-grow">
+          <ProjectRoutes />
+        </div>
+        <Footer />
+      </Router>
     </div>
   );
 }

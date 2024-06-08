@@ -7,6 +7,7 @@ phases:
       - echo $REACT_APP_REGION_AWS >> .env.production
       - echo "REACT_APP_REG=hola" >> .env.production
       - echo "REACT_APP_REGION_AWS2=$REACT_APP_REGION_AWS" >> .env.production
+      - echo REACT_APP_REGION_AWS2=$REACT_APP_REGION_AWS >> .env.production
       - echo "REACT_APP_CLIENT_ID_AWS=$REACT_APP_CLIENT_ID_AWS" >> .env.production
       - npm install
       - npm run lint

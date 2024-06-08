@@ -14,7 +14,7 @@ phases:
       - npm run lint
   build:
     commands:
-      - echo $REACT_APP_REGION_AWS
+      - echo $REACT_APP_REGION_AWS 
       - npm run build
 
 artifacts:

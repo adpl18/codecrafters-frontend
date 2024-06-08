@@ -11,15 +11,13 @@ import {
 // test1234code
 
 export const cognitoClient = new CognitoIdentityProviderClient({
-  region: "us-east-1",
-  // region: process.env.REACT_APP_REGION_AWS,
+  region: process.env.REACT_APP_REGION_AWS,
 });
 
 export const signIn = async (username, password) => {
   const params = {
     AuthFlow: "USER_PASSWORD_AUTH",
-    ClientId: "7q06v34k47fm0065k1d1mepre3",
-    // ClientId: "7q06v34k47fm0065k1d1mepre3",
+    ClientId: process.env.REACT_APP_CLIENT_ID_AWS,
     AuthParameters: {
       USERNAME: username,
       PASSWORD: password,
@@ -42,7 +40,7 @@ export const signIn = async (username, password) => {
 
 export const signUp = async (email, password) => {
   const params = {
-    ClientId: "7q06v34k47fm0065k1d1mepre3",
+    ClientId: process.env.REACT_APP_CLIENT_ID_AWS,
     Username: email,
     Password: password,
     UserAttributes: [
@@ -65,7 +63,7 @@ export const signUp = async (email, password) => {
 
 export const confirmSignUp = async (username, code) => {
   const params = {
-    ClientId: "7q06v34k47fm0065k1d1mepre3",
+    ClientId: process.env.REACT_APP_CLIENT_ID_AWS,
     Username: username,
     ConfirmationCode: code,
   };
@@ -83,7 +81,7 @@ export const confirmSignUp = async (username, code) => {
 
 export const forgotPassword = async (email) => {
   const params = {
-    ClientId: "7q06v34k47fm0065k1d1mepre3",
+    ClientId: process.env.REACT_APP_CLIENT_ID_AWS,
     Username: email,
   };
 
@@ -97,7 +95,7 @@ export const forgotPassword = async (email) => {
 
 export const resetPassword = async (email, code, password) => {
   const params = {
-    ClientId: "7q06v34k47fm0065k1d1mepre3",
+    ClientId: process.env.REACT_APP_CLIENT_ID_AWS,
     Username: email,
     ConfirmationCode: code,
     Password: password,

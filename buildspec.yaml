@@ -3,9 +3,9 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - touch .env.production
-      - echo $REACT_APP_REGION_AWS >> .env.production
-      - echo $REACT_APP_CLIENT_ID_AWS >> .env.production
+      - touch .env
+      - echo $REACT_APP_REGION_AWS >> .env
+      - echo $REACT_APP_CLIENT_ID_AWS >> .env
       - npm install
       - npm run lint
   build:

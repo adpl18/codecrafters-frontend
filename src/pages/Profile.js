@@ -5,7 +5,7 @@ import { logout } from '../auth/authService';
 import { useNavigate } from 'react-router-dom';
 import Login from '../layouts/Login';
 
-const Profile = () => {
+export default function Profile() {
   const { userInfo, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -36,6 +36,4 @@ const Profile = () => {
       <Link to="/">Go Home</Link>
     </div>
   );
-};
-
-export default Profile;
+}

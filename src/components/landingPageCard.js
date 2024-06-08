@@ -1,6 +1,7 @@
 import React from "react";
+import PropTypes from 'prop-types';
 
-export default function LandingPageCard(props) {
+function LandingPageCard(props) {
   const { principalText, secondaryText, icon } = props;
   return (
     <div className="flex-col bg-white 2xl:h-96 lg:h-80 sm:h-72 2xl:w-96 lg:w-72 sm:w-56 drop-shadow-2xl rounded-2xl align-center justify-center">
@@ -20,3 +21,11 @@ export default function LandingPageCard(props) {
     </div>
   );
 }
+
+LandingPageCard.propTypes = {
+  principalText: PropTypes.string.isRequired,
+  secondaryText: PropTypes.string.isRequired,
+  icon: PropTypes.element.isRequired
+};
+
+export default LandingPageCard;

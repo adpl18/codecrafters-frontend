@@ -17,6 +17,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Create env file
+        run: |
+          touch .env
+          echo "REACT_APP_REGION_AWS=${{ secrets.REACT_APP_REGION_AWS }}" >> .env
+          echo "REACT_APP_CLIENT_ID_AWS=${{ secrets.REACT_APP_CLIENT_ID_AWS }}" >> .env
+          cat .env
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:

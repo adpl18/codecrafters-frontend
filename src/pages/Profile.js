@@ -1,16 +1,21 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../auth/useAuth';
-import { logout } from '../auth/authService';
 import { useNavigate } from 'react-router-dom';
-import Login from '../layouts/Login';
+import UserContext from "../auth/UserContext";
 
 export default function Profile() {
-  const { userInfo, isAuthenticated } = useAuth();
+  const { userInfo, setUserInfo, logout } = useContext(UserContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userInfo) {
+      navigate("/login");
+    }
+  }, [userInfo, navigate]);
 
   const handleLogout = () => {
     logout();
+    setUserInfo(null);
     navigate("/");
   };
 
@@ -19,19 +24,13 @@ export default function Profile() {
       <h1>User Profile</h1>
       <p>This is the users profile page.</p>
       
-      {isAuthenticated && userInfo ? (
+      {userInfo ? (
         <div>
           <p>Name: {userInfo.name}</p>
           <p>Email: {userInfo.email}</p>
           <button onClick={handleLogout}>Logout</button>
         </div>
-      ) 
-      : (
-        <div>
-          <p>User is not authenticated.</p>
-          <Login />
-        </div>
-      )
+      ) : null
     }
       <Link to="/">Go Home</Link>
     </div>

@@ -1,14 +1,16 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signIn, signUp, forgotPassword, resetPassword } from '../auth/authService';
+import { signIn, signUp, forgotPassword, resetPassword, getUserInfo } from '../auth/authService';
+import UserContext from '../auth/UserContext';
 
-const Login = () => {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const { setUserInfo } = useContext(UserContext);
   const [code, setCode] = useState('');
   const navigate = useNavigate();
 
@@ -20,6 +22,12 @@ const Login = () => {
       if (session && typeof session.AccessToken !== 'undefined') {
         sessionStorage.setItem('accessToken', session.AccessToken);
         if (sessionStorage.getItem('accessToken')) {
+          try {
+            const userResponse = await getUserInfo(session.AccessToken);
+            setUserInfo(userResponse);
+          } catch (error) {
+            console.error('Error fetching user info:', error);
+          }
           navigate('/');
         } else {
           console.error('Session token was not set properly.');
@@ -130,6 +138,4 @@ const Login = () => {
       )}
     </div>
   );
-};
-
-export default Login;
+}

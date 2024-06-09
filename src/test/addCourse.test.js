@@ -1,10 +1,8 @@
+import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import { act } from 'react';
 import AddCourse from '../pages/AddCourse';
 import { BrowserRouter as Router } from 'react-router-dom';
 import UserContext from '../auth/UserContext';
-import { useNavigate } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
 
 // Mock de fetch
 // export const mockFetch = (data, status = 200, statusText = 'OK') => {
@@ -38,7 +36,7 @@ jest.mock('react-router-dom', () => {
 describe('Test name from button save', () => {
   it('should render Guardar when the user is login', async () => {
     // window.fetch = mockFetch({ response: 'ok' });
-    const { getByRole, findByRole, findAllByRole } = render(
+    const { findByRole } = render(
       <Router>
         <UserContext.Provider value={
           mockUserValue
@@ -49,6 +47,7 @@ describe('Test name from button save', () => {
       </Router>
     );
     const button = await findByRole('button', {name: 'Guardar'});
+    console.log(button)
     // fireEvent.click(button);
     // expect(fetch).toHaveBeenCalledWith('url_del_api', {
     //   method: 'POST',
@@ -58,8 +57,8 @@ describe('Test name from button save', () => {
     //   body: JSON.stringify({ /* datos del curso */ }),
     // });
   })
-  it('should render Iniciar sesión when the user is not login', async () => {
-    const { getByRole, findByRole, findAllByRole } = render(
+  it('should render Iniciar sesión when the user is not login and redirect to login page', async () => {
+    const { findByRole } = render(
       <Router>
         <UserContext.Provider value={{...mockUserValue, userInfo: null}}>
           <AddCourse />

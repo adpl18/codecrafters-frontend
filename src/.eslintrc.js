@@ -18,5 +18,6 @@ module.exports = {
       "react"
   ],
   "rules": {
+    "testing-library/prefer-screen-queries": "off"
   },
 }

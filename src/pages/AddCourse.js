@@ -48,7 +48,6 @@ export default function AddCourse() {
 
   return (
     <div>
-
       <div className="bg-white m-10 p-10 drop-shadow-2xl rounded-2xl align-center justify-center">
         <div className="2xl:mx-56 lg:mx-28 sm:mx-12 space-y-5">
           <h1 className="2xl:text-6xl lg:text-6xl sm:text-5xl space-y-4 font-bold drop-shadow-2xl text-slate-900 shadow-black">

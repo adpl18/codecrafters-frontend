@@ -10,7 +10,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
-  const { setUserInfo, setLoading } = useContext(UserContext);
+  const { setUserInfo } = useContext(UserContext);
   const [code, setCode] = useState('');
   const navigate = useNavigate();
 
@@ -25,9 +25,9 @@ export default function Login() {
           try {
             const userResponse = await getUserInfo(session.AccessToken);
             setUserInfo(userResponse);
-            setLoading(false);
           } catch (error) {
             console.error('Error fetching user info:', error);
+            setUserInfo(false);
           }
           navigate('/');
         } else {

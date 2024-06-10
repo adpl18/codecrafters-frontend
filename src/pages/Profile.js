@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import UserContext from "../auth/UserContext";
 
 export default function Profile() {
-  const { userInfo, loading, setUserInfo, logout } = useContext(UserContext);
+  const { userInfo, setUserInfo, logout } = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!userInfo && !loading) {
+    if (userInfo === false) {
       navigate("/login");
     }
-  }, [userInfo, loading, navigate]);
+  }, [userInfo, navigate]);
 
   const handleLogout = () => {
     logout();

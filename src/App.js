@@ -11,7 +11,6 @@ import "./assets/css/App.css";
 
 function App() {
   const [userInfo, setUserInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -20,9 +19,9 @@ function App() {
         try {
           const userResponse = await getUserInfo(accessToken);
           setUserInfo(userResponse);
-          setLoading(false);
         } catch (error) {
           console.error('Error fetching user info:', error);
+          setUserInfo(false);
         }
       }
     };
@@ -31,7 +30,7 @@ function App() {
   }, []);
 
   return (
-    <UserContext.Provider value={{ userInfo, loading, setLoading, setUserInfo, logout }}>
+    <UserContext.Provider value={{ userInfo, setUserInfo, logout }}>
       {
       <div className="App flex flex-col min-h-screen" style={{ 
           backgroundImage: `url(${backgroundImage})`,

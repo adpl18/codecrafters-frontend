@@ -1,17 +1,17 @@
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signIn, signUp, forgotPassword, resetPassword, getUserInfo } from '../auth/authService';
+import { signUp, signIn, getUserInfo } from '../auth/authService';
 import UserContext from '../auth/UserContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [family_name, setFamilyName] = useState('');
+  const [birthdate, setBirthdate] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const { setUserInfo } = useContext(UserContext);
-  const [code, setCode] = useState('');
   const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
@@ -48,95 +48,111 @@ export default function Login() {
       return;
     }
     try {
-      await signUp(email, password);
+      await signUp(email, password, {
+        name: name,
+        family_name: family_name,
+        birthdate: birthdate
+      });
       navigate('/');
     } catch (error) {
-      alert(`Sign up failed: ${error}`);
+      alert(`Sign up failed: ${error.message}`);
     }
   };
-
-  
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    try {
-      await forgotPassword(email);
-      alert('A password reset link has been sent to your email.');
-    } catch (error) {
-      alert(`Failed to initiate password reset: ${error}`);
-    }
-  };
-
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    try {
-      await resetPassword(email, code, password);
-      alert('Password reset successful');
-    } catch (error) {
-      alert(`Failed to reset password: ${error}`);
-    }
-  }
 
   return (
-    <div className="loginForm">
-      <h1>Welcome</h1>
-      <h4>{isSignUp ? 'Sign up to create an account' : 'Sign in to your account'}</h4>
-      <form onSubmit={isSignUp ? handleSignUp : handleSignIn}>
-        <div>
-          <input
-            className="inputText"
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            required
-          />
-        </div>
-        <div>
-          <input
-            className="inputText"
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-          />
-        </div>
-        <div>
-          <input
-            className="inputText"
-            id="code"
-            type="code"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Código"
-          />
-        </div>
-        {isSignUp && (
+    <div className="flex items-center justify-center min-h-screen bg-cover bg-center">
+      <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Bienvenid@</h1>
+        <h4 className="text-xl text-center text-gray-700 mb-6">
+          {isSignUp ? 'Ingresa tus datos para Registrarte' : 'Ingresa tus datos para Iniciar Sesión'}
+        </h4>
+        <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-6">
           <div>
             <input
-              className="inputText"
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm Password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
               required
             />
           </div>
-        )}
-        <button type="submit">{isSignUp ? 'Sign Up' : 'Sign In'}</button>
-      </form>
-      <button onClick={() => setIsSignUp(!isSignUp)}>
-        {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
-      </button>
-      {!isSignUp && (
-        <div>
-          <button onClick={handleForgotPassword}>Forgot Password</button>
-          <button onClick={handleResetPassword}>Reset Password</button>
-        </div>
-      )}
+          <div>
+            <input
+              className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500"
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Contraseña"
+              required
+            />
+          </div>
+          {isSignUp && (
+            <>
+              <div>
+                <input
+                  className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500"
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirma tu contraseña"
+                  required
+                />
+              </div>
+              <div>
+                <input
+                  className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500"
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Nombre"
+                  required
+                />
+              </div>
+              <div>
+                <input
+                  className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500"
+                  id="familyName"
+                  type="text"
+                  value={family_name}
+                  onChange={(e) => setFamilyName(e.target.value)}
+                  placeholder="Apellido"
+                  required
+                />
+              </div>
+              <div>
+                <input
+                  className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500"
+                  id="birthdate"
+                  type="date"
+                  value={birthdate}
+                  onChange={(e) => setBirthdate(e.target.value)}
+                  placeholder="Dia de nacimiento"
+                  required
+                />
+              </div>
+            </>
+          )}
+          <div>
+            <button
+              type="submit"
+              className="w-full py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline"
+            >
+              {isSignUp ? 'Registrarse' : 'Iniciar Sesión'}
+            </button>
+          </div>
+        </form>
+        <button
+          onClick={() => setIsSignUp(!isSignUp)}
+          className="w-full py-2 mt-4 text-center text-blue-500 hover:underline focus:outline-none"
+        >
+          {isSignUp ? '¿Ya tienes una cuenta? Inicia sesión' : '¿No tienes una cuenta? Regístrate aquí'}
+        </button>
+      </div>
     </div>
   );
 }

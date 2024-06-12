@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import profile from "../assets/images/profile.png";
-import menu from "../assets/images/menu.png";
 
 function Navbar() {
     return (
@@ -41,7 +40,6 @@ function Navbar() {
               style={{backgroundColor: '#00ABD0'}}
             >
               <Link to="/profile" className="flex">
-                <img src={menu} alt="profile" className="w-6 h-6" />
                 <img src={profile} alt="profile" className="w-6 h-6" />
               </Link>
             </div>

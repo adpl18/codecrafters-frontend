@@ -7,7 +7,7 @@ export default function Profile() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!userInfo) {
+    if (userInfo === false) {
       console.log("hola")
       navigate("/login");
     }

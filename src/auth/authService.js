@@ -5,10 +5,10 @@ import {
   ConfirmSignUpCommand, 
   ForgotPasswordCommand, 
   ConfirmForgotPasswordCommand,
-  GetUserCommand
+  GetUserCommand,
+  UpdateUserAttributesCommand,
+  DeleteUserCommand
 } from "@aws-sdk/client-cognito-identity-provider";
-
-// test1234code
 
 export const cognitoClient = new CognitoIdentityProviderClient({
   region: process.env.REACT_APP_REGION_AWS,
@@ -38,7 +38,7 @@ export const signIn = async (username, password) => {
   }
 };
 
-export const signUp = async (email, password) => {
+export const signUp = async (email, password, birthdate, family_name, name) => {
   const params = {
     ClientId: "7q06v34k47fm0065k1d1mepre3",
     Username: email,
@@ -47,6 +47,18 @@ export const signUp = async (email, password) => {
       {
         Name: "email",
         Value: email,
+      },
+      {
+        Name: "birthdate",
+        Value: birthdate,
+      },
+      {
+        Name: "family_name",
+        Value: family_name,
+      },
+      {
+        Name: "name",
+        Value: name,
       },
     ],
   };
@@ -78,16 +90,16 @@ export const confirmSignUp = async (username, code) => {
   }
 };
 
-
 export const forgotPassword = async (email) => {
   const params = {
-    ClientId: "7q06v34k47fm0065k1d1mepre3",
+    ClientId: process.env.REACT_APP_CLIENT_ID_AWS,
     Username: email,
   };
 
   try {
     const command = new ForgotPasswordCommand(params);
     await cognitoClient.send(command);
+    console.log("Password reset email sent successfully");
   } catch (error) {
     throw new Error(`Failed to initiate password reset: ${error.message}`);
   }
@@ -125,6 +137,37 @@ export const getUserInfo = async (accessToken) => {
     return userAttributes;
   } catch (error) {
     console.error('Error getting user info:', error);
+    throw error;
+  }
+};
+
+export const updateUserAttributes = async (accessToken, attributes) => {
+  const params = {
+    AccessToken: accessToken,
+    UserAttributes: attributes,
+  };
+
+  try {
+    const command = new UpdateUserAttributesCommand(params);
+    const response = await cognitoClient.send(command);
+    console.log("User attributes updated successfully:", response);
+    return response;
+  } catch (error) {
+    console.error("Error updating user attributes:", error);
+    throw error;
+  }
+};
+
+export const deleteUser = async (accessToken) => {
+  const params = {
+    AccessToken: accessToken,
+  };
+  try {
+    const command = new DeleteUserCommand(params);
+    await cognitoClient.send(command);
+    console.log("User deleted successfully");
+  } catch (error) {
+    console.error("Error deleting user: ", error);
     throw error;
   }
 };

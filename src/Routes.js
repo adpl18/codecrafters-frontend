@@ -5,6 +5,7 @@ import NotFound from "./pages/404";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import AddCourse from "./pages/AddCourse";
+import Busqueda from "./pages/Busqueda";
 
 const ProjectRoutes = () => {
     let element = useRoutes([
@@ -13,6 +14,7 @@ const ProjectRoutes = () => {
         { path: "/login", element: <Login />},
         { path: "/profile", element: <Profile />},
         { path: "/addcourse", element: <AddCourse />},
+        { path: "/busqueda", element: <Busqueda />},
     ]);
 
     return element;

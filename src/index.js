@@ -3,24 +3,13 @@ import ReactDOM from 'react-dom/client';
 import './assets/css/index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-
-// async function deferRender() {
-// 	const { browser } = await import("./mocks/server.js");
-// 	return browser.start();
-// }
-
-// deferRender().then(() => {
-// 	ReactDOM.createRoot(document.getElementById("root")).render(
-// 		<React.StrictMode>
-// 			<App />
-// 		</React.StrictMode>
-// 	);
-// });
+import { ToastContainer } from 'react-toastify';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <App />
+    <ToastContainer />
   </React.StrictMode>
 );
 

@@ -5,7 +5,7 @@ import Dropdown from '../components/dropdown';
 import Modal from 'react-modal';
 import { deleteUser } from '../auth/authService';
 import API from '../api/endpoints';
-import { get, post } from '../api/functions';
+import { get, post, put, remove } from '../api/functions';
 import plus from '../assets/images/plus.png';
 import { optionsHours, daysOfWeekCompleteName, daysOfWeekNumber } from '../config';
 
@@ -13,11 +13,14 @@ export default function Profile() {
   const { userInfo, setUserInfo, logout } = useContext(UserContext);
   const today = new Date();
   const [selectedDay, setSelectedDay] = useState(null);
-  const [selectedTimeRange, setSelectedTimeRange] = useState(null);
+  const [selectedTimeRange, setSelectedTimeRange] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(null);
-  const [availabilitiesTimes, setAvailabilitiesTimes] = useState({'Lu': [], 'Ma': [], 'Mi': [], 'Ju': [], 'Vi': [], 'Sa': [], 'Do': []});
+  // const [availabilitiesTimes, setAvailabilitiesTimes] = useState({'Lu': [], 'Ma': [], 'Mi': [], 'Ju': [], 'Vi': [], 'Sa': [], 'Do': []});
+  const [availabilitiesTimes, setAvailabilitiesTimes] = useState([]);
   const navigate = useNavigate();
+  const availabilitiesByDay = {'Lu': [], 'Ma': [], 'Mi': [], 'Ju': [], 'Vi': [], 'Sa': [], 'Do': []};
 
   useEffect(() => {
     if (!userInfo) {
@@ -29,25 +32,13 @@ export default function Profile() {
     fetchAvailabilities();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userInfo, availabilitiesTimes]);
+  }, []);
 
   const fetchAvailabilities = async () => {
     get(API.GET_AVAILABILITIES())
     // get(API.GET_AVAILABILITIES_USER(1))
       .then((response) => {
-        response.availabilities.map((availability) => {
-          const date = new Date(availability.date);
-          const newHour = `${availability.startTime.slice(0, -3)} - ${availability.endTime.slice(0, -3)}`;
-          const selectedDay = Object.keys(daysOfWeekNumber).find(day => daysOfWeekNumber[day] === date.getDay());
-          // const selectedDay = Object.keys(availabilitiesTimes)[date.getDay()]; // El sexto día es el día sábado ('Sa')
-          const hourAlreadyExists = availabilitiesTimes[selectedDay].includes(newHour);
-          const newState = { ...availabilitiesTimes };
-          if (!hourAlreadyExists) {
-            newState[selectedDay] = [...newState[selectedDay], newHour];
-            setAvailabilitiesTimes(newState);
-          }
-          return null;
-        });
+        setAvailabilitiesTimes(response.availabilities);
       })
       .catch((error) => {
         console.error(error);
@@ -55,11 +46,21 @@ export default function Profile() {
     );
   }
 
-  const handleLogout = () => {
-    logout();
-    setUserInfo(null);
-    navigate("/");
-  };
+  // Filtro y orden de las horas por días de semana
+  const filteredAvailabilities = availabilitiesTimes.filter(availability => {
+    const availabilityDate = new Date(availability.date);
+    return availabilityDate >= currentWeek.start && availabilityDate <= currentWeek.end;
+  });
+
+  filteredAvailabilities.forEach(availability => {
+    const date = new Date(availability.date);
+    const dayOfWeek = Object.keys(daysOfWeekNumber).find(day => daysOfWeekNumber[day] === date.getDay());
+    availabilitiesByDay[dayOfWeek].push(availability);
+  });
+
+  Object.keys(availabilitiesByDay).forEach(day => {
+    availabilitiesByDay[day].sort((a, b) => a.startTime.localeCompare(b.startTime));
+  });
 
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, '0');
@@ -78,31 +79,54 @@ export default function Profile() {
     setCurrentWeek({ start: monday, end: sunday });
   }
 
+  const handleLogout = () => {
+    logout();
+    setUserInfo(null);
+    navigate("/");
+  };
+
   const handleEditProfile = () => {
     navigate("/edit-profile");
   };
-  
+
   const handleClickOpenModal = (day) => {
     setSelectedDay(day);
+    setSelectedTimeRange({});
     setIsModalOpen(true);
+  };
+
+  const handleClickOpenModalEdit = (time, day) => {
+    setSelectedDay(day);
+    setSelectedTimeRange(time);
+    setIsModalEditOpen(true);
   };
 
   const handleClickSaveDate = async () => {
     const userId = 1;
     if (selectedDay && selectedTimeRange) {
-      const [startTime, endTime] = selectedTimeRange.split(' - ');
       //  Obtner el número que representa el día de la semana
       const numberDay = daysOfWeekNumber[selectedDay];
       const selectedDate = new Date(currentWeek.start);
       selectedDate.setDate(selectedDate.getDate() + numberDay);
       const formattedDate = selectedDate.toISOString().split('T')[0];
-      console.log(userInfo); // Output: "2024-06-13"
-
-      const newTime = { date: formattedDate, startTime: startTime, endTime: endTime, isAvailable: true, userId: userId };
-      await post(API.POST_AVAILABILITIES(), newTime);
+      const newTime = { date: formattedDate, startTime: selectedTimeRange.startTime, endTime: selectedTimeRange.endTime, isAvailable: true, userId: userId };
+      await post(API.POST_AVAILABILITIES(), newTime, "Horario agregado correctamente");
       fetchAvailabilities();
       setIsModalOpen(false);
     }
+  };
+
+  const handleClickBlock = async () => {
+    const newTime = { ...selectedTimeRange };
+    newTime.isAvailable = !selectedTimeRange.isAvailable;
+    await put(API.PUT_AVAILABILITIES(newTime.id), newTime, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
+    setIsModalEditOpen(false);
+  };
+
+  const handleClickDelete = async () => {
+    await remove(API.DELETE_AVAILABILITIES(selectedTimeRange.id), `Horario eliminado correctamente`);
+    setIsModalEditOpen(false);
+    fetchAvailabilities();
   };
 
   const handleDeleteAccount = async () => {
@@ -165,16 +189,16 @@ export default function Profile() {
         <div className="w-2/3 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl">
           <div>Semana del {currentWeek ? `${formatDate(currentWeek.start)} - ${formatDate(currentWeek.end)}` : "Cargando..."}</div>
           <div className="grid grid-cols-7 gap-0.5">
-            {Object.keys(availabilitiesTimes).map((day, index) => (
+            {Object.keys(availabilitiesByDay).map((day, index) => (
               <div key={index} className="bg-white-200 text-center py-4">{day}</div>
             ))}
             <div className="bg-gray-500 h-1 col-span-7"></div>
             
-            {Object.entries(availabilitiesTimes).map(([day, hours], index) => (
+            {Object.entries(availabilitiesByDay).map(([day, hours], index) => (
               <div key={index} className="bg-white-200 flex flex-col items-center py-4">
-                {hours.slice().sort().map((time, indexHour) => (
-                  <div key={indexHour} className="bg-gray-200 text-center py-2 px-4 rounded-full m-1" style={{ width: '130px' }}>
-                    {time}
+                {hours.map((hour, indexHour) => (
+                  <div key={indexHour} className="bg-gray-200 text-center py-2 px-4 rounded-full m-1 cursor-pointer" style={{ width: '130px' }} onClick={() => handleClickOpenModalEdit(hour, day)}>
+                    {hour.startTime.slice(0, 5)} - {hour.endTime.slice(0, 5)}
                   </div>
                 ))}
                 <img onClick={() => handleClickOpenModal(day)} src={plus} alt="Agregar horario" className="w-7 h-7" /> 
@@ -195,7 +219,7 @@ export default function Profile() {
           },
           content: {
             width: '50%',
-            height: '50%',
+            height: '55%',
             margin: 'auto',
             backgroundColor: 'white',
             padding: '20px',
@@ -205,19 +229,52 @@ export default function Profile() {
       >
         <div className="p-4">
           <h1 className="text-center 2xl:text-lg:text-4xl sm:text-3xl space-y-4 font-bold drop-shadow-2xl text-slate-900 shadow-black">
-            Agregar horario para {daysOfWeekCompleteName[selectedDay]}
+            Agregar horario para {daysOfWeekCompleteName[selectedDay]} {currentWeek ? formatDate(currentWeek.start) : null}
           </h1>
           <div className="flex justify-center mt-8">
             <Dropdown 
               placeholder={"Elegir horario"}
               options={optionsHours} 
-              optionsSelected={availabilitiesTimes[selectedDay]}
+              optionsSelected={availabilitiesByDay[selectedDay]}
               onSelect={(selectedOption) => setSelectedTimeRange(selectedOption)}
             />
           </div>
-          <p className="mt-20 text-center text-xl text-gray-600">Horario seleccionado: {selectedTimeRange || '...'}</p>
+          <p className="mt-20 text-center text-xl text-gray-600">Horario seleccionado: {selectedTimeRange.startTime ? `${selectedTimeRange.startTime.slice(0, 5)} - ${selectedTimeRange.endTime.slice(0, 5)}` : '...'}</p>
           <button onClick={handleClickSaveDate} className="block mx-auto mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
             Aceptar
+          </button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isModalEditOpen}
+        onRequestClose={() => setIsModalEditOpen(false)}
+        contentLabel="Editar horario"
+        ariaHideApp={false}
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+          },
+          content: {
+            width: '40%',
+            height: '30%',
+            margin: 'auto',
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+          }
+        }}
+      >
+        <div className="p-4">
+          <h1 className="text-center 2xl:text-lg:text-4xl sm:text-3xl space-y-4 drop-shadow-2xl text-slate-900 shadow-black">
+            Editar horario {daysOfWeekCompleteName[selectedDay]} {selectedTimeRange.length > 0 ? `${selectedTimeRange.startTime.slice(0, 5)} - ${selectedTimeRange.endTime.slice(0, 5)}` : null}
+          </h1>
+          {/* <button onClick={handleClickSaveDate} className="block mx-auto mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"> */}
+          <button onClick={handleClickBlock} className="block mx-auto mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            {selectedTimeRange.isAvailable ? "Bloquear" : "Desbloquear"}
+          </button>
+          <button onClick={handleClickDelete} className="block mx-auto mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Eliminar
           </button>
         </div>
       </Modal>

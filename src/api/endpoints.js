@@ -9,5 +9,7 @@ export const API = {
   GET_AVAILABILITIES: () => `${process.env.REACT_APP_API_URL}availabilities/`,
   POST_AVAILABILITIES: () => `${process.env.REACT_APP_API_URL}availabilities/`,
   GET_AVAILABILITIES_USER: userId => `${process.env.REACT_APP_API_URL}availabilities/${userId}`,
+  PUT_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/${availabilityId}`,
+  DELETE_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/${availabilityId}`,
 };
 export default API;

@@ -176,4 +176,5 @@ export const logout = () => {
   sessionStorage.removeItem('idToken');
   sessionStorage.removeItem('accessToken');
   sessionStorage.removeItem('refreshToken');
+  localStorage.removeItem('token');
 };

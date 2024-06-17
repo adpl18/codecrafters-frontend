@@ -1,8 +1,6 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { signUp, signIn, confirmSignUp, getUserInfo, forgotPassword } from '../auth/authService';
-import { signUp, signIn, confirmSignUp, getUserInfo } from '../auth/authService';
-import UserContext from '../auth/UserContext';
+import { signUp, signIn, confirmSignUp } from '../auth/authService';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -14,7 +12,6 @@ export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [confirmationCode, setConfirmationCode] = useState('');
   const [isConfirming, setIsConfirming] = useState(false);
-  const { setUserInfo } = useContext(UserContext);
   const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
@@ -25,13 +22,7 @@ export default function Login() {
       if (session && typeof session.AccessToken !== 'undefined') {
         sessionStorage.setItem('accessToken', session.AccessToken);
         if (sessionStorage.getItem('accessToken')) {
-          try {
-            const userResponse = await getUserInfo(session.AccessToken);
-            setUserInfo(userResponse);
-          } catch (error) {
-            console.error('Error fetching user info:', error);
-            setUserInfo(false);
-          }
+          localStorage.setItem('token', sessionStorage.getItem('accessToken'))
           navigate('/');
         } else {
           console.error('Session token was not set properly.');

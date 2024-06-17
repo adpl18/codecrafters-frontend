@@ -13,7 +13,7 @@ const Dropdown = ({ placeholder, options, optionsSelected, onSelect }) => {
 
   const handleOptionClick = (option) => {
     if (optionsSelected) {
-      if (optionsSelected.includes(option)) {
+      if (isNotAvailable(option)) {
         return;
       }
     }
@@ -23,8 +23,24 @@ const Dropdown = ({ placeholder, options, optionsSelected, onSelect }) => {
   };
 
   const filteredOptions = options.filter(option =>
-    option.toLowerCase().includes(searchTerm.toLowerCase())
+    (typeof dayOfWeek === 'string')
+      ? option.toLowerCase().includes(searchTerm.toLowerCase())
+      : `${option.startTime} - ${option.endTime}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const isNotAvailable = (option) => {
+    return optionsSelected.some(optionSelected => {
+      return optionSelected.startTime.slice(0, 5) === option.startTime && optionSelected.endTime.slice(0, 5) === option.endTime;
+    });
+  };
+
+  const optionFormat = (option) => {
+    if (typeof dayOfWeek === 'string') {
+      return option;
+    } else {
+      return `${option.startTime} - ${option.endTime}`;
+    }
+  }
 
   return (
     <div className="relative">
@@ -33,7 +49,7 @@ const Dropdown = ({ placeholder, options, optionsSelected, onSelect }) => {
         className="bg-gray-800 text-white px-4 py-2 rounded-full focus:outline-none focus:bg-gray-700 shadow-md flex items-center justify-between w-64 h-12"
         style={{ backgroundColor: '#f6f6f6', color: '#4D4D4D' }}
       >
-        <span className="mr-auto">{selectedOption || placeholder}</span>
+        <span className="mr-auto">{selectedOption ? optionFormat(selectedOption) : placeholder}</span>
         <img
           src={arrowDown}
           alt="Flecha hacia abajo"
@@ -55,9 +71,9 @@ const Dropdown = ({ placeholder, options, optionsSelected, onSelect }) => {
                 <button
                   onClick={() => handleOptionClick(option)}
                   className="block w-full px-4 py-2 text-left text-gray-800 hover:bg-gray-200 focus:outline-none"
-                  style={{ color: optionsSelected && optionsSelected.includes(option) ? '#A1A0A0' : '#4D4D4D' }}
+                  style={{ color: optionsSelected && isNotAvailable(option) ? '#A1A0A0' : '#4D4D4D' }}
                 >
-                  {option}
+                  {optionFormat(option)}
                 </button>
               </li>
             ))}

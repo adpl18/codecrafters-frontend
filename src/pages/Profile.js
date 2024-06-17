@@ -33,11 +33,22 @@ export default function Profile() {
   }, [isLoading]);
 
   const fetchUserInfo = async () => {
+    console.log("FETCHING USER INFO")
     const tokenUser = localStorage.getItem("token");
+    console.log("TOKEN", tokenUser)
     if (tokenUser) {
-      const userResponse = await getUserInfo(tokenUser);
-      setUserInfo(userResponse);
-      setIsLoading(false);
+      console.log("aquires")
+      try {
+        const userResponse = await getUserInfo(tokenUser);
+        setUserInfo(userResponse);
+        setIsLoading(false);
+      } catch (error) {
+        navigate("/login");
+      }
+        // console.log("UUUSEr", userResponse)
+        // if (userResponse.error) {
+      //   navigate("/login");
+      //   return
     } else {
       navigate("/login");
     }

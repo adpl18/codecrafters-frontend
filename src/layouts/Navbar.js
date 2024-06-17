@@ -33,6 +33,7 @@ function Navbar() {
               className="rounded-full p-2 px-4 text-center mr-7"
               style={{backgroundColor: '#F4F3F3'}}
             >
+              {/* Levantar modal para agregar nueva */}
               <Link to="/addcourse">Publica una clase</Link>
             </div>
             <div 

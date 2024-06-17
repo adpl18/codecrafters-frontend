@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserContext from "../auth/UserContext";
+import { getUserInfo } from '../auth/authService';
 import Dropdown from '../components/dropdown';
 import Modal from 'react-modal';
 import { deleteUser } from '../auth/authService';
@@ -8,42 +8,53 @@ import API from '../api/endpoints';
 import { get, post, put, remove } from '../api/functions';
 import plus from '../assets/images/plus.png';
 import { optionsHours, daysOfWeekCompleteName, daysOfWeekNumber } from '../config';
+import Login from './Login';
+import { logout } from '../auth/authService';
 
 export default function Profile() {
-  const { userInfo, setUserInfo, logout } = useContext(UserContext);
+  const [userInfo, setUserInfo] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const today = new Date();
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(null);
-  // const [availabilitiesTimes, setAvailabilitiesTimes] = useState({'Lu': [], 'Ma': [], 'Mi': [], 'Ju': [], 'Vi': [], 'Sa': [], 'Do': []});
   const [availabilitiesTimes, setAvailabilitiesTimes] = useState([]);
   const navigate = useNavigate();
   const availabilitiesByDay = {'Lu': [], 'Ma': [], 'Mi': [], 'Ju': [], 'Vi': [], 'Sa': [], 'Do': []};
 
   useEffect(() => {
-    if (!userInfo) {
-      navigate("/login");
-    }
-    
+    fetchUserInfo();
     // Obtener fechas de la semana actual y disponibilidades
     getStartAndEndDateOfWeek();
     fetchAvailabilities();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isLoading]);
+
+  const fetchUserInfo = async () => {
+    const tokenUser = localStorage.getItem("token");
+    if (tokenUser) {
+      const userResponse = await getUserInfo(tokenUser);
+      setUserInfo(userResponse);
+      setIsLoading(false);
+    } else {
+      navigate("/login");
+    }
+  }
 
   const fetchAvailabilities = async () => {
-    get(API.GET_AVAILABILITIES())
-    // get(API.GET_AVAILABILITIES_USER(1))
-      .then((response) => {
-        setAvailabilitiesTimes(response.availabilities);
-      })
-      .catch((error) => {
-        console.error(error);
-      }
-    );
+    if (userInfo) {
+      get(API.GET_AVAILABILITIES())
+      // get(API.GET_AVAILABILITIES_USER(1))
+        .then((response) => {
+          setAvailabilitiesTimes(response.availabilities);
+        })
+        .catch((error) => {
+          console.error(error);
+        }
+      );
+    }
   }
 
   // Filtro y orden de las horas por días de semana
@@ -154,7 +165,10 @@ export default function Profile() {
     }
   };
 
-  return (userInfo &&
+  return (
+    isLoading ? "Cargando..." :
+    userInfo
+    ?
     <div className="flex items-center justify-center min-h-screen bg-cover bg-center">
       <div className="flex justify-center text-center space-x-4 w-full p-10">
         <div className="w-1/3 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl">
@@ -279,5 +293,6 @@ export default function Profile() {
         </div>
       </Modal>
     </div>
+    : <Login />
   );
 }

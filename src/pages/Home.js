@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserContext from "../auth/UserContext"
+// import UserContext from "../auth/UserContext"
 import LandingPageCard from '../components/landingPageCard';
 import Dropdown from '../components/dropdown';
 import inputIcon from "../assets/images/input.png";
@@ -9,14 +9,12 @@ import estudiarIcon from "../assets/images/estudiar.png";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { userInfo } = useContext(UserContext);
+  // const { userInfo } = useContext(UserContext);
 
   const handleClickSearch = () => {
-    if (!userInfo) {
-      navigate('/busqueda');
-      return;
-    }
+    navigate('/busqueda');
     console.log('Busqueda de profesor');
+    return;
   };
 
   return (

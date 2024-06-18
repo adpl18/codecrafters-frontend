@@ -26,7 +26,7 @@ function ModalAddCourse({closeModal}) {
     if (accessToken) {
       try {
         const userResponse = await getUserInfo(accessToken);
-        get(API.GET_USER(userResponse.email))
+        get(API.GET_USER_EMAIL(userResponse.email))
         .then((response) => {
           setBackendUserInfo(response.user);
           setIsLoading(false);

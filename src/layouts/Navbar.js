@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import profile from "../assets/images/profile.png";
+import Modal from 'react-modal';
+import ModalAddCourse from "../components/modalAddCourse";
 
 function Navbar() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
     return (
       <div className="bg-white m-5 p-5 shadow-lg rounded-2xl align-center justify-center">
         <div className="flex justify-between items-center">
@@ -32,9 +36,9 @@ function Navbar() {
             <div 
               className="rounded-full p-2 px-4 text-center mr-7"
               style={{backgroundColor: '#F4F3F3'}}
+              onClick={() => setIsModalOpen(true)}
             >
-              {/* Levantar modal para agregar nueva */}
-              <Link to="/addcourse">Publica una clase</Link>
+              Publica una clase
             </div>
             <div 
               className="rounded-full p-2 px-4 text-center shadow-md"
@@ -46,6 +50,30 @@ function Navbar() {
             </div>
           </div>
         </div>
+        
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        contentLabel="Editar horario"
+        ariaHideApp={false}
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+          },
+          content: {
+            width: '40%',
+            height: 'auto',
+            maxWidth: '80%',
+            maxHeight: '80%',
+            margin: 'auto',
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+          }
+        }}
+      >
+        <ModalAddCourse closeModal={() => setIsModalOpen(false)}/>
+      </Modal>
       </div>
     );
 }

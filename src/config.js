@@ -17,3 +17,5 @@ export const optionsHours = [
 
 export const daysOfWeekCompleteName = {'Lu': 'Lunes', 'Ma': 'Martes', 'Mi': 'Miércoles', 'Ju': 'Jueves', 'Vi': 'Viernes', 'Sa': 'Sábado', 'Do': 'Domingo'};
 export const daysOfWeekNumber = {'Lu': 1, 'Ma': 2, 'Mi': 3, 'Ju': 4, 'Vi': 5, 'Sa': 6, 'Do': 0};
+
+export const categoryOptions = ['Matemáticas', 'Química', 'Física', 'Programación', 'Lenguaje', 'Otros'];

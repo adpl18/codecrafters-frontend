@@ -5,7 +5,7 @@ import NotFound from "./pages/404";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
-import AddCourse from "./pages/AddCourse";
+import Course from "./pages/Course";
 import Busqueda from "./pages/Busqueda";
 
 const ProjectRoutes = () => {
@@ -15,7 +15,7 @@ const ProjectRoutes = () => {
         { path: "/login", element: <Login />},
         { path: "/profile", element: <Profile />},
         { path: "/edit-profile", element: <EditProfile />},
-        { path: "/addcourse", element: <AddCourse />},
+        { path: "/course/:id", element: <Course />},
         { path: "/busqueda", element: <Busqueda />},
     ]);
 

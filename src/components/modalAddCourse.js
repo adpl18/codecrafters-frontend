@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { getUserInfo } from '../auth/authService';
-import { get } from '../api/functions';
+import { get, post } from '../api/functions';
 import API from '../api/endpoints';
 import Dropdown from './dropdown';
+import { categoryOptions } from '../config';
 
 function ModalAddCourse({closeModal}) {
   const [isLoading, setIsLoading] = useState(true);
@@ -43,8 +44,22 @@ function ModalAddCourse({closeModal}) {
     closeModal();
   }
 
-  const handleClickSaveCourse = () => {
+  const handleClickSaveCourse = async () => {
     console.log(selectedArea, courseName, courseDescription, priceCourse);
+    const data = {
+      name: courseName,
+      price: priceCourse,
+      description: courseDescription,
+      category: selectedArea,
+      userId: backendUserInfo.id
+    }
+
+    const response = await post(API.POST_COURSE(), data, "Curso creado exitosamente");
+    if (response.ok) {
+      closeModal();
+    } else {
+      console.error("Error al crear el curso");
+    }
   }
 
   return (
@@ -67,7 +82,7 @@ function ModalAddCourse({closeModal}) {
             <div className="flex mt-8 justify-between">
               <Dropdown 
                 placeholder={"Elegir área"} 
-                options={['Matemáticas', 'Química', 'Física']}
+                options={categoryOptions}
                 onSelect={(selectedOption) => setSelectedArea(selectedOption)} 
               />
               <input 

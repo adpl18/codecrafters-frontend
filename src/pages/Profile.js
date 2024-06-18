@@ -15,6 +15,7 @@ export default function Profile() {
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [backendUserInfo, setBackendUserInfo] = useState(null);
+  const [courses, setCourses] = useState([{}]);
   const today = new Date();
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState({});
@@ -31,6 +32,7 @@ export default function Profile() {
     // Obtener fechas de la semana actual y disponibilidades
     getStartAndEndDateOfWeek();
     fetchAvailabilities();
+    fetchCourses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
 
@@ -39,7 +41,7 @@ export default function Profile() {
     if (accessToken) {
       try {
         const userResponse = await getUserInfo(accessToken);
-        get(API.GET_USER(userResponse.email))
+        get(API.GET_USER_EMAIL(userResponse.email))
         .then((response) => {
           setBackendUserInfo(response.user);
           setUserInfo(userResponse);
@@ -57,11 +59,23 @@ export default function Profile() {
   }
 
   const fetchAvailabilities = async () => {
-    if (userInfo) {
-      get(API.GET_AVAILABILITIES())
-      // get(API.GET_AVAILABILITIES_USER(1))
+    if (backendUserInfo) {
+      get(API.GET_AVAILABILITIES_USER(backendUserInfo.id))
         .then((response) => {
           setAvailabilitiesTimes(response.availabilities);
+        })
+        .catch((error) => {
+          console.error(error);
+        }
+      );
+    }
+  }
+  
+  const fetchCourses = async () => {
+    if (backendUserInfo) {
+      get(API.GET_COURSES_USER(backendUserInfo.id))
+        .then((response) => {
+          setCourses(response.courses);
         })
         .catch((error) => {
           console.error(error);
@@ -126,14 +140,13 @@ export default function Profile() {
   };
 
   const handleClickSaveDate = async () => {
-    const userId = 1;
     if (selectedDay && selectedTimeRange) {
       //  Obtner el número que representa el día de la semana
       const numberDay = daysOfWeekNumber[selectedDay];
       const selectedDate = new Date(currentWeek.start);
       selectedDate.setDate(selectedDate.getDate() + numberDay);
       const formattedDate = selectedDate.toISOString().split('T')[0];
-      const newTime = { date: formattedDate, startTime: selectedTimeRange.startTime, endTime: selectedTimeRange.endTime, isAvailable: true, userId: userId };
+      const newTime = { date: formattedDate, startTime: selectedTimeRange.startTime, endTime: selectedTimeRange.endTime, isAvailable: true, userId: backendUserInfo.id };
       await post(API.POST_AVAILABILITIES(), newTime, "Horario agregado correctamente");
       fetchAvailabilities();
       setIsModalOpen(false);
@@ -143,8 +156,10 @@ export default function Profile() {
   const handleClickBlock = async () => {
     const newTime = { ...selectedTimeRange };
     newTime.isAvailable = !selectedTimeRange.isAvailable;
-    await put(API.PUT_AVAILABILITIES(newTime.id), newTime, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
+    await put(API.PUT_CANCEL_AVAILABILITIES(selectedTimeRange.id), {}, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
+    // await put(API.PUT_AVAILABILITIES(newTime.id), newTime, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
     setIsModalEditOpen(false);
+    fetchAvailabilities();
   };
 
   const handleClickDelete = async () => {
@@ -183,63 +198,85 @@ export default function Profile() {
 
   return (
     isLoading ?
-      <div className="flex items-center justify-center min-h-screen bg-cover bg-center">
+      <div className="flex items-center justify-center min-h-screen bg-cover">
         <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
           <p>Loading...</p>
         </div>
       </div>
      : userInfo ?
-    <div className="flex items-center justify-center min-h-screen bg-cover bg-center">
-      <div className="flex justify-center text-center space-x-4 w-full p-10">
-        <div className="w-1/3 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl">
-          <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">{userInfo.name} {userInfo.family_name}</h1>
-          <div className="text-center">
-            {userInfo ? (
-              <div className="space-y-4">
-                <p><span className="font-bold">Email:</span> {userInfo.email}</p>
-                <p><span className="font-bold">Día de Nacimiento:</span> {new Date(userInfo.birthdate).toLocaleDateString()}</p>
-                <button
-                  onClick={handleEditProfile}
-                  className="w-full py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mb-4"
-                >
-                  Editar Usuario
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline"
-                >
-                  Cerrar Sesión
-                </button>
-                <button
-                  onClick={handleDeleteAccount}
-                  className="w-full py-2 bg-gray-500 hover:bg-gray-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4"
-                >
-                  Eliminar Cuenta
-                </button>
-              </div>
-            ) : null}
+     <div>
+      <div>
+        <div className="flex  text-center space-x-4 w-full p-10">
+          <div className="w-1/3 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl">
+            <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">{userInfo.name} {userInfo.family_name}</h1>
+            <div className="text-center">
+              {userInfo ? (
+                <div className="space-y-4">
+                  <p><span className="font-bold">Email:</span> {userInfo.email}</p>
+                  <p><span className="font-bold">Día de Nacimiento:</span> {new Date(userInfo.birthdate).toLocaleDateString()}</p>
+                  <button
+                    onClick={handleEditProfile}
+                    className="w-full py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mb-4"
+                  >
+                    Editar Usuario
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline"
+                  >
+                    Cerrar Sesión
+                  </button>
+                  <button
+                    onClick={handleDeleteAccount}
+                    className="w-full py-2 bg-gray-500 hover:bg-gray-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4"
+                  >
+                    Eliminar Cuenta
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+          <div className="w-2/3 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl">
+            <div>Semana del {currentWeek ? `${formatDate(currentWeek.start)} - ${formatDate(currentWeek.end)}` : "Cargando..."}</div>
+            <div className="grid grid-cols-7 gap-0.5">
+              {Object.keys(availabilitiesByDay).map((day, index) => (
+                <div key={index} className="bg-white-200 text-center py-4">{day}</div>
+              ))}
+              <div className="bg-gray-500 h-1 col-span-7"></div>
+              
+              {Object.entries(availabilitiesByDay).map(([day, hours], index) => (
+                <div key={index} className="bg-white-200 flex flex-col items-center py-4">
+                  {hours.map((hour, indexHour) => (
+                    <div key={indexHour} className="bg-gray-200 text-center py-2 px-4 rounded-full m-1 cursor-pointer" style={{ width: '130px' }} onClick={() => handleClickOpenModalEdit(hour, day)}>
+                      {hour.startTime.slice(0, 5)} - {hour.endTime.slice(0, 5)}
+                    </div>
+                  ))}
+                  <img onClick={() => handleClickOpenModal(day)} src={plus} alt="Agregar horario" className="w-7 h-7" /> 
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="w-2/3 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl">
-          <div>Semana del {currentWeek ? `${formatDate(currentWeek.start)} - ${formatDate(currentWeek.end)}` : "Cargando..."}</div>
-          <div className="grid grid-cols-7 gap-0.5">
-            {Object.keys(availabilitiesByDay).map((day, index) => (
-              <div key={index} className="bg-white-200 text-center py-4">{day}</div>
-            ))}
-            <div className="bg-gray-500 h-1 col-span-7"></div>
-            
-            {Object.entries(availabilitiesByDay).map(([day, hours], index) => (
-              <div key={index} className="bg-white-200 flex flex-col items-center py-4">
-                {hours.map((hour, indexHour) => (
-                  <div key={indexHour} className="bg-gray-200 text-center py-2 px-4 rounded-full m-1 cursor-pointer" style={{ width: '130px' }} onClick={() => handleClickOpenModalEdit(hour, day)}>
-                    {hour.startTime.slice(0, 5)} - {hour.endTime.slice(0, 5)}
+      </div>
+      <div>
+        {courses.length > 0 ? (
+          <div>
+            <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis Cursos</h1>
+            <div className="flex justify-center text-center space-x-4 w-full p-10">
+              {courses.map((course, index) => (
+              <div key={index} className="w-1/3 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl" onClick={() => navigate(`/course/${course.id}`)}>
+                <div className="text-center">
+                    <div className="space-y-4">
+                      <p><span className="font-bold">Nombre:</span> {course.name}</p>
+                      <p><span className="font-bold">Precio:</span> {course.price}</p>
+                      <p><span className="font-bold">Descripción:</span> {course.description}</p>
+                    </div>
                   </div>
-                ))}
-                <img onClick={() => handleClickOpenModal(day)} src={plus} alt="Agregar horario" className="w-7 h-7" /> 
-              </div>
-            ))}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
       
       <Modal

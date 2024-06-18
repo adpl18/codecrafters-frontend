@@ -50,7 +50,6 @@ export default function Home() {
               style={{ zIndex: 1 }} 
               className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-transparent rounded-e-lg focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-500" 
               placeholder="    ingresar..." 
-              // required 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

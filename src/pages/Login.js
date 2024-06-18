@@ -16,6 +16,7 @@ export default function Login() {
   const [isConfirming, setIsConfirming] = useState(false);
   const { setUserInfo } = useContext(UserContext);
   const navigate = useNavigate();
+  console.log(`${process.env.REACT_APP_BACKEND_URL}`);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -59,7 +60,7 @@ export default function Login() {
       await signUp(email, password, birthdate, family_name, name);
       
       // Llamada al backend para crear el usuario
-      const response = await fetch(`${process.env.BACKEND_URL}/users`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -8,6 +8,7 @@
     "@testing-library/react": "^16.0.0",
     "autoprefixer": "^10.4.19",
     "aws-amplify": "^6.3.6",
+    "dotenv": "^16.4.5",
     "env-cmd": "^10.1.0",
     "postcss": "^8.4.38",
     "react": "^18.3.1",

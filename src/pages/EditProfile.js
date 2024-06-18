@@ -1,11 +1,14 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import UserContext from '../auth/UserContext';
 import { updateUserAttributes, getUserInfo } from '../auth/authService';
 
 export default function EditProfile() {
   const { userInfo, setUserInfo } = useContext(UserContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const userId = location.state?.userId;
+
   const [name, setName] = useState(userInfo?.name || '');
   const [family_name, setFamilyName] = useState(userInfo?.family_name || '');
   const [birthdate, setBirthdate] = useState(userInfo?.birthdate || '');
@@ -35,8 +38,8 @@ export default function EditProfile() {
       await updateUserAttributes(accessToken, attributes);
       
       // Llamada al backend para actualizar usuario
-      const response = await fetch(`${process.env.BACKEND_URL}/users`, {
-        method: 'PATCH',
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${userId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },

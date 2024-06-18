@@ -1,6 +1,6 @@
 export const API = {
   // Endpoints para cursos
-  GET_COURSES: () => `${process.env.REACT_APP_API_URL}/courses`,
+  GET_COURSES: () => `${process.env.REACT_APP_API_URL}courses`,
   GET_COURSE: courseId => `${process.env.REACT_APP_API_URL}courses/${courseId}`,
 
   // Endpoints para usuarios

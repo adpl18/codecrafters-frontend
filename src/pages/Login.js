@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signUp, signIn, confirmSignUp } from '../auth/authService';
+import API from '../api/endpoints';
+import { post } from '../api/functions';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -22,7 +24,6 @@ export default function Login() {
       if (session && typeof session.AccessToken !== 'undefined') {
         sessionStorage.setItem('accessToken', session.AccessToken);
         if (sessionStorage.getItem('accessToken')) {
-          localStorage.setItem('token', sessionStorage.getItem('accessToken'))
           navigate('/');
         } else {
           console.error('Session token was not set properly.');
@@ -50,18 +51,13 @@ export default function Login() {
       await signUp(email, password, birthdate, family_name, name);
       
       // Llamada al backend para crear el usuario
-      const response = await fetch(`${process.env.BACKEND_URL}/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await post(API.POST_USER(), 
+        {
           firstName: name,
           lastName: family_name,
           email,
           birthdate,
-        }),
-      });
+      })
   
       if (response.ok) {
         setIsConfirming(true);
@@ -79,7 +75,7 @@ export default function Login() {
       await confirmSignUp(email, confirmationCode);
       alert('Bienvenido a CodeCrafters');
       setIsConfirming(false);
-      setIsSignUp(false);
+      setIsSignUp(false);      
     } catch (error) {
       alert(`Confirmation failed: ${error.message}`);
     }

@@ -14,6 +14,7 @@ import { logout } from '../auth/authService';
 export default function Profile() {
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [backendUserInfo, setBackendUserInfo] = useState(null);
   const today = new Date();
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState({});
@@ -26,6 +27,7 @@ export default function Profile() {
 
   useEffect(() => {
     fetchUserInfo();
+
     // Obtener fechas de la semana actual y disponibilidades
     getStartAndEndDateOfWeek();
     fetchAvailabilities();
@@ -33,22 +35,22 @@ export default function Profile() {
   }, [isLoading]);
 
   const fetchUserInfo = async () => {
-    console.log("FETCHING USER INFO")
-    const tokenUser = localStorage.getItem("token");
-    console.log("TOKEN", tokenUser)
-    if (tokenUser) {
-      console.log("aquires")
+    const accessToken = sessionStorage.getItem('accessToken');
+    if (accessToken) {
       try {
-        const userResponse = await getUserInfo(tokenUser);
-        setUserInfo(userResponse);
-        setIsLoading(false);
+        const userResponse = await getUserInfo(accessToken);
+        get(API.GET_USER(userResponse.email))
+        .then((response) => {
+          setBackendUserInfo(response.user);
+          setUserInfo(userResponse);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          navigate("/login");
+        });
       } catch (error) {
         navigate("/login");
       }
-        // console.log("UUUSEr", userResponse)
-        // if (userResponse.error) {
-      //   navigate("/login");
-      //   return
     } else {
       navigate("/login");
     }
@@ -108,7 +110,7 @@ export default function Profile() {
   };
 
   const handleEditProfile = () => {
-    navigate("/edit-profile");
+    navigate("/edit-profile", { state: { userId: backendUserInfo?.id } });
   };
 
   const handleClickOpenModal = (day) => {
@@ -158,15 +160,18 @@ export default function Profile() {
         const accessToken = sessionStorage.getItem('accessToken');
         
         await deleteUser(accessToken);
+
+        const response = await remove(API.DELETE_USER(backendUserInfo?.id));
         
-        const response = await fetch(`${process.env.BACKEND_URL}/users/${userInfo.id}`, {
-          method: 'DELETE',
-        });
+        // const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${backendUserInfo?.id}`, {
+        //   method: 'DELETE',
+        // });
   
         if (response.ok) {
           logout();
           setUserInfo(null);
           navigate("/");
+          console.log("USUARIO ELIMINADO CORRECTAMENTE EN EL BACKEND")
         } else {
           throw new Error('Failed to delete user on backend');
         }
@@ -177,9 +182,13 @@ export default function Profile() {
   };
 
   return (
-    isLoading ? "Cargando..." :
-    userInfo
-    ?
+    isLoading ?
+      <div className="flex items-center justify-center min-h-screen bg-cover bg-center">
+        <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
+          <p>Loading...</p>
+        </div>
+      </div>
+     : userInfo ?
     <div className="flex items-center justify-center min-h-screen bg-cover bg-center">
       <div className="flex justify-center text-center space-x-4 w-full p-10">
         <div className="w-1/3 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl">
@@ -188,7 +197,7 @@ export default function Profile() {
             {userInfo ? (
               <div className="space-y-4">
                 <p><span className="font-bold">Email:</span> {userInfo.email}</p>
-                <p><span className="font-bold">Día de Nacimiento:</span> {userInfo.birthdate}</p>
+                <p><span className="font-bold">Día de Nacimiento:</span> {new Date(userInfo.birthdate).toLocaleDateString()}</p>
                 <button
                   onClick={handleEditProfile}
                   className="w-full py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mb-4"

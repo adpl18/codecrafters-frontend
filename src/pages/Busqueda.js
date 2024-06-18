@@ -4,6 +4,7 @@ import Dropdown from '../components/dropdown';
 import { get } from '../api/functions';
 import API from '../api/endpoints';
 import profileIcon from "../assets/images/user.png";
+import { categoryOptions } from '../config';
 
 export default function Busqueda() {
   const [courses, setCourses] = useState([]);
@@ -126,7 +127,7 @@ export default function Busqueda() {
             <div className="mt-6">
               <Dropdown
                 placeholder="Elegir categoria"
-                options={['Elegir categoria','Matematica', 'Quimica', 'Fisica']}
+                options={categoryOptions}
                 onSelect={(option) => setSelectedCategory(option)}
                 className="z-10"
               />

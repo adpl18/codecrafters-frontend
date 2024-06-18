@@ -34,18 +34,19 @@ export async function post(url, data, msg=null) {
     });
 
     if (!response.ok) {
-      toast.error("Ha ocurrido un error en el evnvío");
+      toast.error("Ha ocurrido un error en el envío");
       console.log("Error: ", response.status, response.statusText)
+      return { ok: false }
     } else {
       const dataResponse = await response.json();
       if (msg) {
         toast.success(msg);
       }
-      return dataResponse;
+      return {data: dataResponse, ok: true};
     }
     
   } catch (err) {
-    toast.error("Ha ocurrido un error en el evnvío");
+    toast.error("Ha ocurrido un error en el envío");
     console.log("Error: ", url, err)
   }
 }
@@ -64,12 +65,13 @@ export async function put(url, data, msg=null) {
     if (!response.ok) {
       toast.error("Ha ocurrido un error en el envío");
       console.log("Error: ", response.status, response.statusText)
+      return { ok: false }
     } else {
       const dataResponse = await response.json();
       if (msg) {
         toast.success(msg);
       }
-      return dataResponse;
+      return {data: dataResponse, ok: true};
     }
 
   } catch (err) {
@@ -91,12 +93,13 @@ export async function remove(url, msg=null) {
     if (!response.ok) {
       toast.error("Ha ocurrido un error en el envío");
       console.log("Error: ", response.status, response.statusText)
+      return { ok: false }
     } else {
       const dataResponse = await response.json();
       if (msg) {
         toast.success(msg);
       }
-      return dataResponse;
+      return {data: dataResponse, ok: true };
     }
 
   } catch (err) {

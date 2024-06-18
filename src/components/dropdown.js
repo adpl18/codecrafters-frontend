@@ -23,7 +23,7 @@ const Dropdown = ({ placeholder, options, optionsSelected, onSelect }) => {
   };
 
   const filteredOptions = options.filter(option =>
-    (typeof dayOfWeek === 'string')
+    (typeof option === 'string')
       ? option.toLowerCase().includes(searchTerm.toLowerCase())
       : `${option.startTime} - ${option.endTime}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -35,7 +35,7 @@ const Dropdown = ({ placeholder, options, optionsSelected, onSelect }) => {
   };
 
   const optionFormat = (option) => {
-    if (typeof dayOfWeek === 'string') {
+    if (typeof option === 'string') {
       return option;
     } else {
       return `${option.startTime} - ${option.endTime}`;

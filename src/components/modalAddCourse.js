@@ -7,7 +7,7 @@ import API from '../api/endpoints';
 import Dropdown from './dropdown';
 import { categoryOptions } from '../config';
 
-function ModalAddCourse({closeModal}) {
+function ModalAddCourse({closeModal, reload}) {
   const [isLoading, setIsLoading] = useState(true);
   const [backendUserInfo, setBackendUserInfo] = useState(false);
   const [courseName, setCourseName] = useState('');
@@ -57,6 +57,9 @@ function ModalAddCourse({closeModal}) {
     const response = await post(API.POST_COURSE(), data, "Curso creado exitosamente");
     if (response.ok) {
       closeModal();
+      if (reload) {
+        window.location.reload()
+      }
     } else {
       console.error("Error al crear el curso");
     }
@@ -116,6 +119,7 @@ function ModalAddCourse({closeModal}) {
 
 ModalAddCourse.propTypes = {
   closeModal: PropTypes.func.isRequired,
+  reload: PropTypes.bool.isRequired,
 };
 
 export default ModalAddCourse;

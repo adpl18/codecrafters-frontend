@@ -2,13 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { get } from '../api/functions';
 import API from '../api/endpoints';
+import Calendar from '../components/calendar';
+import Modal from 'react-modal';
+import { daysOfWeekCompleteName } from '../config';
 
 export default function Course() {
   const { id } = useParams();
   const [courseInfo, setCourseInfo] = useState({});
   const [teacherInfo, setTeacherInfo] = useState({});
+  const [availabilities, setAvailabilities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedFormattedDate, setSelectedFormattedDate] = useState(null);
+  const [selectedTimeRange, setSelectedTimeRange] = useState({});
+
   useEffect(() => {
     fecthCourseInfo();
 
@@ -20,6 +28,7 @@ export default function Course() {
       .then(data => {
         setCourseInfo(data.course);
         fetchTeacherInfo(data.course.userId);
+        fetchAvailabilities(data.course.userId);
         setIsLoading(false);
       })
       .catch(err => {
@@ -37,6 +46,29 @@ export default function Course() {
       });
   }
 
+  const fetchAvailabilities = async (userId) => {
+    get(API.GET_AVAILABILITIES_USER(userId))
+      .then(data => {
+        setAvailabilities(data.availabilities);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  const handleClickOnTime = (time, day, formattedDate) => {
+    setSelectedFormattedDate(formattedDate);
+    setSelectedDay(day);
+    setSelectedTimeRange(time);
+    setIsModalOpen(true);
+  };
+
+  const handleClickReserve = () => {
+    setIsModalOpen(false);
+    console.log(selectedFormattedDate)
+  }
+  
   return (
     isLoading 
       ?
@@ -45,31 +77,53 @@ export default function Course() {
             <p>Loading...</p>
           </div>
         </div>
-      : courseInfo ?
-        <div className="flex items-center justify-center min-h-screen bg-cover bg-center">
-          <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl w-full max-w-md">
-            <h1 className="text-2xl font-bold text-center">{courseInfo.name}</h1>
-            <p className="text-center text-gray-500">Profesor: {teacherInfo.firstName} {teacherInfo.lastName}</p>
-            {/* <div>Semana del {currentWeek ? `${formatDate(currentWeek.start)} - ${formatDate(currentWeek.end)}` : "Cargando..."}</div>
-            <div className="grid grid-cols-7 gap-0.5">
-              {Object.keys(availabilitiesByDay).map((day, index) => (
-                <div key={index} className="bg-white-200 text-center py-4">{day}</div>
-              ))}
-              <div className="bg-gray-500 h-1 col-span-7"></div>
-              
-              {Object.entries(availabilitiesByDay).map(([day, hours], index) => (
-                <div key={index} className="bg-white-200 flex flex-col items-center py-4">
-                  {hours.map((hour, indexHour) => (
-                    <div key={indexHour} className="bg-gray-200 text-center py-2 px-4 rounded-full m-1 cursor-pointer" style={{ width: '130px' }} onClick={() => handleClickOpenModalEdit(hour, day)}>
-                      {hour.startTime.slice(0, 5)} - {hour.endTime.slice(0, 5)}
-                    </div>
-                  ))}
-                  <img onClick={() => handleClickOpenModal(day)} src={plus} alt="Agregar horario" className="w-7 h-7" /> 
+      :
+      <div>
+        {courseInfo 
+        ?
+          <div className="flex justify-center m-10">
+            <div className="bg-white p-10 rounded-lg shadow-xl w-full">
+              <h1 className="text-2xl font-bold text-center">{courseInfo.name}</h1>
+              <p className="text-center text-gray-500">Profesor: {teacherInfo.firstName} {teacherInfo.lastName}</p>
+              <div className="flex justify-center mt-8">
+                <div className="w-full md:w-3/4">
+                  {availabilities.length > 0 
+                    ? <Calendar availabilities={availabilities} canEdit={false} functionClickOnTime={handleClickOnTime} />
+                    : "Cargando..."
+                  }
                 </div>
-              ))}
-            </div> */}
+              </div>
+            </div>
           </div>
-        </div>
-        : null
+        : null}    
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={() => setIsModalOpen(false)}
+          contentLabel="Editar horario"
+          ariaHideApp={false}
+          style={{
+            overlay: {
+              backgroundColor: 'rgba(0, 0, 0, 0.5)'
+            },
+            content: {
+              width: '50%',
+              height: '40%',
+              margin: 'auto',
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+            }
+          }}
+        >
+          <div className="p-4">
+            <h1 className="text-center 2xl:text-lg:text-4xl sm:text-3xl space-y-4 drop-shadow-2xl text-slate-900 shadow-black">
+              Horario seleccionado: {daysOfWeekCompleteName[selectedDay]} {selectedTimeRange.startTime ? `${selectedTimeRange.startTime.slice(0, 5)} - ${selectedTimeRange.endTime.slice(0, 5)}` : null}
+            </h1>
+            <button onClick={handleClickReserve} className="block mx-auto mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+              Reservar
+            </button>
+          </div>
+        </Modal>
+      </div>
   );
 }

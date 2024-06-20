@@ -102,7 +102,7 @@ export default function Busqueda() {
 
   return (
     <div className="min-h-screen flex ">
-      <div className="w-1/7 flex flex-col justify-center items-start p-8">
+      <div className="w-1/7 flex flex-col justify-center items-start p-8 fixed left-0 h-screen">
         <form className="w-full max-w-md h-[70%]" onSubmit={handleSearch}>
           <div className="space-y-4">
             <button
@@ -143,7 +143,7 @@ export default function Busqueda() {
         </form>
       </div>
 
-      <div className="flex-grow flex flex-col items-center justify-center p-8">
+      <div className="flex-grow flex flex-col items-center justify-center p-8 ml-9">
         {error && <p className="text-red-500 text-center mt-4">{error}</p>}
         <div className="mt-10">
           {courses.length === 0 ? (

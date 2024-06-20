@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { getUserInfo } from '../auth/authService';
 import { useParams } from 'react-router';
-import { get } from '../api/functions';
+import { get, post } from '../api/functions';
 import API from '../api/endpoints';
 import Calendar from '../components/calendar';
 import Modal from 'react-modal';
@@ -8,6 +9,7 @@ import { daysOfWeekCompleteName } from '../config';
 
 export default function Course() {
   const { id } = useParams();
+  const [backendUserInfo, setBackendUserInfo] = useState(null);
   const [courseInfo, setCourseInfo] = useState({});
   const [teacherInfo, setTeacherInfo] = useState({});
   const [availabilities, setAvailabilities] = useState([]);
@@ -19,9 +21,26 @@ export default function Course() {
 
   useEffect(() => {
     fecthCourseInfo();
+    fetchUserInfo();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const fetchUserInfo = async () => {
+    const accessToken = sessionStorage.getItem('accessToken');
+    if (accessToken) {
+      try {
+        const userResponse = await getUserInfo(accessToken);
+        get(API.GET_USER_EMAIL(userResponse.email))
+        .then((response) => {
+          setBackendUserInfo(response.user);
+          setIsLoading(false);
+        })
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
 
   const fecthCourseInfo = async () => {
     get(API.GET_COURSE(id))
@@ -63,10 +82,13 @@ export default function Course() {
     setSelectedTimeRange(time);
     setIsModalOpen(true);
   };
-
-  const handleClickReserve = () => {
+    
+  const handleClickReserve = async () => {
     setIsModalOpen(false);
     console.log(selectedFormattedDate)
+    console.log(backendUserInfo.id, selectedTimeRange.id)
+    // Reservar horario
+    await post(API.POST_RESERVATION(), {courseId: id, userId: backendUserInfo.id, availabilityId: selectedTimeRange.id}, "Se ha reservado el horario correctamente")
   }
   
   return (
@@ -79,7 +101,7 @@ export default function Course() {
         </div>
       :
       <div>
-        {courseInfo 
+        {courseInfo && backendUserInfo
         ?
           <div className="flex justify-center m-10">
             <div className="bg-white p-10 rounded-lg shadow-xl w-full">

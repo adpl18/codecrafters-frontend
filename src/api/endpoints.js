@@ -18,6 +18,9 @@ export const API = {
   GET_AVAILABILITIES_USER: userId => `${process.env.REACT_APP_API_URL}availabilities/user/${userId}`,
   PUT_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/${availabilityId}`,
   DELETE_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/${availabilityId}`,
-  PUT_CANCEL_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/cancel/${availabilityId}`,
+  PUT_UPDATE_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/update-status/${availabilityId}`,
+
+  // Endpoints para reservas
+  POST_RESERVATION: () => `${process.env.REACT_APP_API_URL}reservations/`,
 };
 export default API;

@@ -137,7 +137,7 @@ export default function Profile() {
   const handleClickBlock = async () => {
     const newTime = { ...selectedTimeRange };
     newTime.isAvailable = !selectedTimeRange.isAvailable;
-    await put(API.PUT_CANCEL_AVAILABILITIES(selectedTimeRange.id), {}, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
+    await put(API.PUT_UPDATE_AVAILABILITIES(selectedTimeRange.id), {isAvailable: !selectedTimeRange.isAvailable}, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
     // await put(API.PUT_AVAILABILITIES(newTime.id), newTime, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
     setIsModalEditOpen(false);
     fetchAvailabilities();

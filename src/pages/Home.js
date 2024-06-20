@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import UserContext from "../auth/UserContext"
 import LandingPageCard from '../components/landingPageCard';
 import Dropdown from '../components/dropdown';
 import inputIcon from "../assets/images/input.png";
 import mailIcon from "../assets/images/mail.png";
 import estudiarIcon from "../assets/images/estudiar.png";
+import { categoryOptions } from "../config";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ export default function Home() {
             <div>
               <Dropdown
                 placeholder="Elegir categoria"
-                options={['Elegir categoria','Matematica', 'Quimica', 'Fisica']}
+                options={['Elegir categoria'].concat(categoryOptions)}
                 onSelect={(option) => setSelectedCategory(option)}
                 className="z-10"
               />

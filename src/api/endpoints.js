@@ -21,6 +21,9 @@ export const API = {
   PUT_UPDATE_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/update-status/${availabilityId}`,
 
   // Endpoints para reservas
+  GET_RESERVATIONS: () => `${process.env.REACT_APP_API_URL}reservations/`,
   POST_RESERVATION: () => `${process.env.REACT_APP_API_URL}reservations/`,
+  PUT_RESERVATION_CANCEL: reservationId => `${process.env.REACT_APP_API_URL}reservations/cancel/${reservationId}`,
+  GET_RESERVATION_COURSE: courseId => `${process.env.REACT_APP_API_URL}reservations/course/${courseId}`,
 };
 export default API;

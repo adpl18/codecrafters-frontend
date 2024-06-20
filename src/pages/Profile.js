@@ -26,6 +26,7 @@ export default function Profile() {
   const [availabilitiesTimes, setAvailabilitiesTimes] = useState([]);
   const navigate = useNavigate();
   const [availabilitiesByDay, setAvailabilitiesByDay] = useState({'Lu': [], 'Ma': [], 'Mi': [], 'Ju': [], 'Vi': [], 'Sa': [], 'Do': []});
+  const [reservations, serReservations] = useState([{}])
 
   useEffect(() => {
     fetchUserInfo();
@@ -34,8 +35,23 @@ export default function Profile() {
     getStartAndEndDateOfWeek();
     fetchAvailabilities();
     fetchCourses();
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
+
+  const fetchReservations = async (availabilities) => {
+    get(API.GET_RESERVATIONS())
+      .then((response) => {
+        const reservationsFilters = response.reservations.filter(reservation => {
+          return availabilities.some(avail => avail.id === reservation.availabilityId);
+        });     
+        serReservations(reservationsFilters);
+      })
+      .catch((error) => {
+        console.error(error);
+      }
+    );
+  }
 
   const fetchUserInfo = async () => {
     const accessToken = sessionStorage.getItem('accessToken');
@@ -64,6 +80,7 @@ export default function Profile() {
       get(API.GET_AVAILABILITIES_USER(backendUserInfo.id))
         .then((response) => {
           setAvailabilitiesTimes(response.availabilities);
+          fetchReservations(response.availabilities);
         })
         .catch((error) => {
           console.error(error);
@@ -138,7 +155,6 @@ export default function Profile() {
     const newTime = { ...selectedTimeRange };
     newTime.isAvailable = !selectedTimeRange.isAvailable;
     await put(API.PUT_UPDATE_AVAILABILITIES(selectedTimeRange.id), {isAvailable: !selectedTimeRange.isAvailable}, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
-    // await put(API.PUT_AVAILABILITIES(newTime.id), newTime, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
     setIsModalEditOpen(false);
     fetchAvailabilities();
   };
@@ -171,6 +187,11 @@ export default function Profile() {
         alert(`Error al eliminar la cuenta: ${error.message}`);
       }
     }
+  };
+
+  const handleClickCancelReservation = async (reservation) => {
+    await put(API.PUT_RESERVATION_CANCEL(reservation.id), {}, "Reserva cancelada correctamente");
+    fetchReservations(availabilitiesTimes);
   };
 
   return (
@@ -233,6 +254,36 @@ export default function Profile() {
                         <p><span className="font-bold">Descripción:</span> {course.description}</p>
                       </div>
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </div>
+      <div>
+        {/* {backendUserInfo.reservations.length > 0 ? ( */}
+        {reservations.length > 0 ? (
+          <div>
+            <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis próximas clases</h1>
+            <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
+              {reservations.map((reservation, index) => (
+                <div key={index} className="w-1/5 mb-8">
+                  <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">                    
+                    <div className="text-center">
+                      <div className="space-y-4">
+                        <p><span className="font-bold">Nombre alumno:</span>{reservation.userId}</p>
+                        <p><span className="font-bold">Precio:</span>{reservation.courseId}</p>
+                        <p><span className="font-bold">Horario reserva:</span>{reservation.availabilityId}</p>
+                        <p><span className="font-bold">Curso:</span>{reservation.courseId}</p>
+                      </div>
+                    </div>
+                    {!reservation.isCancelled 
+                      ? <button onClick={() => handleClickCancelReservation(reservation)} className="w-full py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
+                          Cancelar
+                        </button>
+                      : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div> 
+                    }
                   </div>
                 </div>
               ))}

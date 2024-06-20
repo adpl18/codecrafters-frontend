@@ -26,7 +26,7 @@ export default function Home() {
         </h1>
       </div>
       
-      <form className="w-full max-w-4xl mx-auto mt-11">
+      <div className="w-full max-w-4xl mx-auto mt-11">
         <div className="flex relative">
           <div 
             className="flex relative w-full bg-white border-s-2 rounded-full focus:outline-none focus:bg-gray-700 shadow-md"
@@ -58,16 +58,16 @@ export default function Home() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <button
-              type="button" // change this from "submit" to "button"
+              type="submit"
               style={{ zIndex: 2 }}
               className="text-white absolute end-0 top-1/2 transform -translate-y-1/2 focus:ring-4 focus:outline-none font-medium bg-black hover:bg-gray-900 focus:ring-gray-300 rounded-full text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
-              onClick={handleClickSearch} // attach the handleClickSearch function here
+              onClick={handleClickSearch}
             >
               Buscar
             </button>
           </div>
         </div>
-      </form>
+      </div>
 
 
       <div className="flex 2xl:space-x-16 lg:space-x-8 sm:space-x-2 justify-center text-center mt-20 mb-32">

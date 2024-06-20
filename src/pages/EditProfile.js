@@ -1,20 +1,37 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import UserContext from '../auth/UserContext';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { updateUserAttributes, getUserInfo } from '../auth/authService';
+import { put } from '../api/functions';
+import API from '../api/endpoints';
 
 export default function EditProfile() {
-  const { userInfo, setUserInfo } = useContext(UserContext);
+  const [userInfo, setUserInfo] = useState({}); 
   const navigate = useNavigate();
+  const location = useLocation();
+  const userId = location.state?.userId;
+
   const [name, setName] = useState(userInfo?.name || '');
   const [family_name, setFamilyName] = useState(userInfo?.family_name || '');
   const [birthdate, setBirthdate] = useState(userInfo?.birthdate || '');
 
   useEffect(() => {
-    if (!userInfo) {
-      navigate('/login');
+    fetchUserInfo();    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]);
+
+  const fetchUserInfo = async () => {
+    const accessToken = sessionStorage.getItem('accessToken');
+    if (accessToken) {
+      try {
+        const userResponse = await getUserInfo(accessToken);
+        setUserInfo(userResponse);
+      } catch (error) {
+        navigate("/login");
+      }
+    } else {
+      navigate("/login");
     }
-  }, [userInfo, navigate]);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,17 +52,11 @@ export default function EditProfile() {
       await updateUserAttributes(accessToken, attributes);
       
       // Llamada al backend para actualizar usuario
-      const response = await fetch(`${process.env.BACKEND_URL}/users`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: name,
+      const response = await put(API.PUT_USER(userId), {
+        firstName: name,
           lastName: family_name,
           birthdate,
-        }),
-      });
+      })
   
       if (response.ok) {
         const updatedUserInfo = await getUserInfo(accessToken);

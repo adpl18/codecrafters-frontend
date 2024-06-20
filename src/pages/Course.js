@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { getUserInfo } from '../auth/authService';
 import { useParams } from 'react-router';
-import { get } from '../api/functions';
+import { get, post, put } from '../api/functions';
 import API from '../api/endpoints';
 import Calendar from '../components/calendar';
 import Modal from 'react-modal';
@@ -8,8 +9,8 @@ import { daysOfWeekCompleteName } from '../config';
 
 export default function Course() {
   const { id } = useParams();
+  const [backendUserInfo, setBackendUserInfo] = useState(null);
   const [courseInfo, setCourseInfo] = useState({});
-  const [teacherInfo, setTeacherInfo] = useState({});
   const [availabilities, setAvailabilities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,15 +20,32 @@ export default function Course() {
 
   useEffect(() => {
     fecthCourseInfo();
+    fetchUserInfo();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const fetchUserInfo = async () => {
+    console.log("aca andamos")
+    const accessToken = sessionStorage.getItem('accessToken');
+    if (accessToken) {
+      try {
+        const userResponse = await getUserInfo(accessToken);
+        get(API.GET_USER_EMAIL(userResponse.email))
+        .then((response) => {
+          setBackendUserInfo(response.user);
+          setIsLoading(false);
+        })
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
 
   const fecthCourseInfo = async () => {
     get(API.GET_COURSE(id))
       .then(data => {
         setCourseInfo(data.course);
-        fetchTeacherInfo(data.course.userId);
         fetchAvailabilities(data.course.userId);
         setIsLoading(false);
       })
@@ -36,19 +54,30 @@ export default function Course() {
       });
   }
   
-  const fetchTeacherInfo = async (userId) => {
-    get(API.GET_USER(userId))
-      .then(data => {
-        setTeacherInfo(data.user);
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
+  // const fetchReservations = async (availabilities) => {
+  //   get(API.GET_RESERVATIONS())
+  //     .then((response) => {             
+  //       const reservationsFilters = response.reservations
+  //         .filter(reservation => availabilities.some(avail => avail.id === reservation.availabilityId));
+
+  //       const reservationsDictionary = reservationsFilters.reduce((dict, reservation) => {
+  //           dict[reservation.availabilityId] = reservation;
+  //           return dict;
+  //       }, {});
+
+  //       serReservations(reservationsDictionary);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     }
+  //   );
+  // }
 
   const fetchAvailabilities = async (userId) => {
     get(API.GET_AVAILABILITIES_USER(userId))
       .then(data => {
+        console.log("avaiiii", data.availabilities)
+        // fetchReservations(data.availabilities);
         setAvailabilities(data.availabilities);
         setIsLoading(false);
       })
@@ -58,17 +87,25 @@ export default function Course() {
   }
 
   const handleClickOnTime = (time, day, formattedDate) => {
+    console.log("ACAAAA", time)
     setSelectedFormattedDate(formattedDate);
     setSelectedDay(day);
     setSelectedTimeRange(time);
     setIsModalOpen(true);
   };
-
-  const handleClickReserve = () => {
+    
+  const handleClickReserve = async () => {
     setIsModalOpen(false);
     console.log(selectedFormattedDate)
+    console.log(backendUserInfo.id, selectedTimeRange.id)
+    // Reservar horario
+    const response = await post(API.POST_RESERVATION(), {courseId: id, userId: backendUserInfo.id, availabilityId: selectedTimeRange.id}, "Se ha reservado el horario correctamente")
+    if (response.ok) {
+      await put(API.PUT_UPDATE_AVAILABILITIES(selectedTimeRange.id), {isAvailable: false});
+      fetchAvailabilities(courseInfo.userId);
+    }
   }
-  
+  console.log(courseInfo)
   return (
     isLoading 
       ?
@@ -79,12 +116,12 @@ export default function Course() {
         </div>
       :
       <div>
-        {courseInfo 
+        {courseInfo && backendUserInfo
         ?
           <div className="flex justify-center m-10">
             <div className="bg-white p-10 rounded-lg shadow-xl w-full">
               <h1 className="text-2xl font-bold text-center">{courseInfo.name}</h1>
-              <p className="text-center text-gray-500">Profesor: {teacherInfo.firstName} {teacherInfo.lastName}</p>
+              <p className="text-center text-gray-500">Profesor: {courseInfo.User.firstName} {courseInfo.User.lastName}</p>
               <div className="flex justify-center mt-8">
                 <div className="w-full md:w-3/4">
                   {availabilities.length > 0 

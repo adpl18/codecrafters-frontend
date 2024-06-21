@@ -128,7 +128,7 @@ export default function Busqueda() {
             <div className="mt-6">
               <Dropdown
                 placeholder="Elegir categoria"
-                options={categoryOptions}
+                options={['Elegir categoria'].concat(categoryOptions)}
                 onSelect={(option) => setSelectedCategory(option)}
                 className="z-10"
               />

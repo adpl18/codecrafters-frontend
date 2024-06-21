@@ -15,7 +15,7 @@ export default function Profile() {
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [backendUserInfo, setBackendUserInfo] = useState(null);
-  const [courses, setCourses] = useState([{}]);
+  const [courses, setCourses] = useState([]);
   const today = new Date();
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedFormattedDate, setSelectedFormattedDate] = useState(null);
@@ -26,7 +26,8 @@ export default function Profile() {
   const [availabilitiesTimes, setAvailabilitiesTimes] = useState([]);
   const navigate = useNavigate();
   const [availabilitiesByDay, setAvailabilitiesByDay] = useState({'Lu': [], 'Ma': [], 'Mi': [], 'Ju': [], 'Vi': [], 'Sa': [], 'Do': []});
-  const [reservations, serReservations] = useState([{}])
+  const [reservations, setReservations] = useState([])
+  const [myReservations, setMyReservations] = useState([])
 
   useEffect(() => {
     fetchUserInfo();
@@ -39,13 +40,24 @@ export default function Profile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
 
+  const fetchMyReservations = async (userId) => {
+    get(API.GET_RESERVATION_USER(userId))
+      .then((response) => {
+        setMyReservations(response.reservations);
+      })
+      .catch((error) => {
+        console.error(error);
+      }
+    );
+  }
+
   const fetchReservations = async (availabilities) => {
     get(API.GET_RESERVATIONS())
       .then((response) => {
         const reservationsFilters = response.reservations.filter(reservation => {
           return availabilities.some(avail => avail.id === reservation.availabilityId);
         });     
-        serReservations(reservationsFilters);
+        setReservations(reservationsFilters);
       })
       .catch((error) => {
         console.error(error);
@@ -62,6 +74,7 @@ export default function Profile() {
         .then((response) => {
           setBackendUserInfo(response.user);
           setUserInfo(userResponse);
+          fetchMyReservations(response.user.id);
           setIsLoading(false);
         })
         .catch((error) => {
@@ -179,7 +192,6 @@ export default function Profile() {
           logout();
           setUserInfo(null);
           navigate("/");
-          console.log("USUARIO ELIMINADO CORRECTAMENTE EN EL BACKEND")
         } else {
           throw new Error('Failed to delete user on backend');
         }
@@ -239,6 +251,8 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* Mis cursos */}
       <div>
         {courses.length > 0 ? (
           <div>
@@ -261,21 +275,56 @@ export default function Profile() {
           </div>
         ) : null}
       </div>
+
+      {/* Mis reservas */}
       <div>
-        {/* {backendUserInfo.reservations.length > 0 ? ( */}
         {reservations.length > 0 ? (
           <div>
             <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis próximas clases</h1>
             <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
               {reservations.map((reservation, index) => (
-                <div key={index} className="w-1/5 mb-8">
+                <div key={index} className="w-1/3 mb-8">
                   <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">                    
                     <div className="text-center">
                       <div className="space-y-4">
-                        <p><span className="font-bold">Nombre alumno:</span>{reservation.userId}</p>
-                        <p><span className="font-bold">Precio:</span>{reservation.courseId}</p>
-                        <p><span className="font-bold">Horario reserva:</span>{reservation.availabilityId}</p>
-                        <p><span className="font-bold">Curso:</span>{reservation.courseId}</p>
+                      <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
+                        <p><span className="font-bold">Nombre alumno: </span>{reservation.User.firstName} {reservation.User.lastName}</p>
+                        <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
+                        <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                        <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
+                        <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
+                      </div>
+                    </div>
+                    {!reservation.isCancelled 
+                      ? <button onClick={() => handleClickCancelReservation(reservation)} className="w-full py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
+                          Cancelar
+                        </button>
+                      : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div> 
+                    }
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      {/* Mis solicitudes */}
+      <div>
+        {myReservations.length > 0 ? (
+          <div>
+            <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis solicitudes</h1>
+            <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
+              {myReservations.map((reservation, index) => (
+                <div key={index} className="w-1/3 mb-8">
+                  <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full" >                    
+                    <div className="text-center">
+                      <div className="space-y-4">
+                        <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
+                        <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
+                        <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                        <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
+                        <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
                       </div>
                     </div>
                     {!reservation.isCancelled 

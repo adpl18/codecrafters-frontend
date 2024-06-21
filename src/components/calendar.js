@@ -72,8 +72,6 @@ function Calendar({ availabilities, canEdit, functionClickOnTime, functionClickA
     functionClickOnTime(hour, day, getDate(day))
   }
 
-  console.log(availabilities[0])
-
   return (
     <div>
       <div>Semana del {currentWeek ? `${formatDate(currentWeek.start)} - ${formatDate(currentWeek.end)}` : "Cargando..."}</div>

@@ -62,7 +62,7 @@ function Navbar() {
             backgroundColor: 'rgba(0, 0, 0, 0.5)'
           },
           content: {
-            width: '40%',
+            width: '50%',
             height: 'auto',
             maxWidth: '80%',
             maxHeight: '80%',

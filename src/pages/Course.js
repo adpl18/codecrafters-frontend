@@ -6,6 +6,8 @@ import API from '../api/endpoints';
 import Calendar from '../components/calendar';
 import Modal from 'react-modal';
 import { daysOfWeekCompleteName } from '../config';
+// import { useNavigate } from 'react-router-dom';
+import ModalAddCourse from '../components/modalAddCourse';
 
 export default function Course() {
   const { id } = useParams();
@@ -14,8 +16,10 @@ export default function Course() {
   const [availabilities, setAvailabilities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalCourseOpen, setIsModalCourseOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState({});
+  // const navigate = useNavigate();
 
   useEffect(() => {
     fecthCourseInfo();
@@ -82,6 +86,16 @@ export default function Course() {
     }
   }
 
+  const handleClickEdit = () => {
+    setIsModalCourseOpen(true);
+    // navigate(`/edit-course/${id}`); 
+  }
+
+  const handleClickEditCourse = () => {
+    setIsModalCourseOpen(false);
+    fecthCourseInfo();
+  }
+
   return (
     isLoading 
       ?
@@ -94,10 +108,20 @@ export default function Course() {
       <div>
         {courseInfo && backendUserInfo
         ?
-          <div className="flex justify-center m-10">
-            <div className="bg-white p-10 rounded-lg shadow-xl w-full">
+        <div className="flex justify-center m-10">
+          <div className="bg-white p-10 rounded-lg shadow-xl w-full">
+            {backendUserInfo.id === courseInfo.userId 
+              ? <div style={{ textAlign: 'right' }}>
+                  <button onClick={handleClickEdit} className="p-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
+                    Editar
+                  </button>
+                </div>
+              : null}
               <h1 className="text-2xl font-bold text-center">{courseInfo.name}</h1>
               <p className="text-center text-gray-500">Profesor: {courseInfo.User.firstName} {courseInfo.User.lastName}</p>
+              <p className="text-center text-gray-500">Precio: {courseInfo.price}</p>
+              <p className="text-center text-gray-500">Categoría: {courseInfo.category}</p>
+              <p className="text-center text-gray-500">{courseInfo.description}</p>
               <div className="flex justify-center mt-8">
                 <div className="w-full md:w-3/4">
                   {console.log(courseInfo)}
@@ -106,8 +130,6 @@ export default function Course() {
 
                   
                   {availabilities.length > 0 
-                    // ? backendUserInfo.id === courseInfo.userId 
-                      // ? <Calendar availabilities={availabilities} canEdit={true} functionClickOnTime={handleClickOnTime} functionClickAdd={handleClickAddTime}/>
                     ? <Calendar availabilities={availabilities} canEdit={false} functionClickOnTime={handleClickOnTime} />
                     : "Cargando..."
                   }
@@ -144,6 +166,30 @@ export default function Course() {
             </button>
           </div>
         </Modal>
+          
+      <Modal
+        isOpen={isModalCourseOpen}
+        onRequestClose={() => setIsModalCourseOpen(false)}
+        contentLabel="Editar horario"
+        ariaHideApp={false}
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+          },
+          content: {
+            width: '50%',
+            height: 'auto',
+            maxWidth: '80%',
+            maxHeight: '80%',
+            margin: 'auto',
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+          }
+        }}
+      >
+        <ModalAddCourse closeModal={() => handleClickEditCourse()} reload={false} courseInfo={courseInfo}/>
+      </Modal>
       </div>
   );
 }

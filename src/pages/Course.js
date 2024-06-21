@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getUserInfo } from '../auth/authService';
 import { useParams } from 'react-router';
-import { get, post, put } from '../api/functions';
+import { get, post, put, remove } from '../api/functions'; // Import del function
 import API from '../api/endpoints';
 import Calendar from '../components/calendar';
 import Modal from 'react-modal';
@@ -100,6 +100,16 @@ export default function Course() {
     fecthCourseInfo();
   }
 
+  const handleDeleteCourse = async () => {
+    try {
+      await remove(API.DELETE_COURSE(id)); // Assuming you have an endpoint for deleting the course
+      alert('Curso eliminado correctamente');
+      navigate('/'); // Redirect to home or another appropriate page
+    } catch (error) {
+      console.error('Error eliminando el curso', error);
+    }
+  };
+
   return (
     isLoading 
       ?
@@ -118,6 +128,9 @@ export default function Course() {
               ? <div style={{ textAlign: 'right' }}>
                   <button onClick={handleClickEdit} className="p-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
                     Editar
+                  </button>
+                  <button onClick={handleDeleteCourse} className="p-4 py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4 ml-4">
+                    Eliminar
                   </button>
                 </div>
               : null}
@@ -169,7 +182,7 @@ export default function Course() {
       <Modal
         isOpen={isModalCourseOpen}
         onRequestClose={() => setIsModalCourseOpen(false)}
-        contentLabel="Editar horario"
+        contentLabel="Editar curso"
         ariaHideApp={false}
         style={{
           overlay: {

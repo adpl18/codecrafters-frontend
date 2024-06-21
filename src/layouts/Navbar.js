@@ -23,7 +23,7 @@ function Navbar() {
               >CodeCrafters</h2>
               </Link>
             </div>
-            <div className="mr-7">
+            {/* <div className="mr-7">
               <Link to="/404" style={{color: '#4D4D4D'}}>Sobre nosotros</Link>
             </div>
             <div className="mr-7">
@@ -31,7 +31,7 @@ function Navbar() {
             </div>
             <div className="mr-7">
               <Link to="/404" style={{color: '#4D4D4D'}}>Contacto</Link>
-            </div>
+            </div> */}
           </div>
           <div className="flex justify-center items-center">
             <div 

@@ -104,7 +104,7 @@ export default function Busqueda() {
 
   return (
     <div className="min-h-screen flex ">
-      <div className="w-1/7 flex flex-col justify-center items-start p-8 fixed left-0 h-screen">
+      <div className="w-1/7 flex flex-col justify-center items-start p-8 left-0 h-screen">
         <form className="w-full max-w-md h-[70%]" onSubmit={handleSearch}>
           <div className="space-y-4">
             <button

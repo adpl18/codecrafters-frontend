@@ -5,6 +5,7 @@ export const API = {
   GET_COURSES_USER: userId => `${process.env.REACT_APP_API_URL}courses/teacher/${userId}`,
   POST_COURSE: () => `${process.env.REACT_APP_API_URL}courses`,
   PUT_COURSE: courseId => `${process.env.REACT_APP_API_URL}courses/${courseId}`,
+  DELETE_COURSE: courseId => `${process.env.REACT_APP_API_URL}courses/${courseId}`,
 
   // Endpoints para usuarios
   GET_USER: userId => `${process.env.REACT_APP_API_URL}users/${userId}`,

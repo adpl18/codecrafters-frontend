@@ -6,7 +6,7 @@ import API from '../api/endpoints';
 import Calendar from '../components/calendar';
 import Modal from 'react-modal';
 import { daysOfWeekCompleteName } from '../config';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ModalAddCourse from '../components/modalAddCourse';
 
 export default function Course() {
@@ -19,7 +19,7 @@ export default function Course() {
   const [isModalCourseOpen, setIsModalCourseOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState({});
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fecthCourseInfo();
@@ -68,7 +68,7 @@ export default function Course() {
   }
 
   const handleClickOnTime = (time, day, formattedDate) => {
-    if (backendUserInfo.id === courseInfo.userId) {
+    if (backendUserInfo?.id === courseInfo?.userId) {
       alert("No puedes reservar un horario de tu propio curso");
       return
     }
@@ -78,6 +78,10 @@ export default function Course() {
   };
     
   const handleClickReserve = async () => {
+    if (!isLoading && backendUserInfo === null) {
+      navigate("/login")
+      return
+    }
     setIsModalOpen(false);
     const response = await post(API.POST_RESERVATION(), {courseId: id, userId: backendUserInfo.id, availabilityId: selectedTimeRange.id}, "Se ha reservado el horario correctamente")
     if (response.ok) {
@@ -106,11 +110,11 @@ export default function Course() {
         </div>
       :
       <div>
-        {courseInfo && backendUserInfo
+        {courseInfo
         ?
         <div className="flex justify-center m-10">
           <div className="bg-white p-10 rounded-lg shadow-xl w-full">
-            {backendUserInfo.id === courseInfo.userId 
+            {backendUserInfo?.id === courseInfo.userId 
               ? <div style={{ textAlign: 'right' }}>
                   <button onClick={handleClickEdit} className="p-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
                     Editar
@@ -123,12 +127,7 @@ export default function Course() {
               <p className="text-center text-gray-500">Categoría: {courseInfo.category}</p>
               <p className="text-center text-gray-500">{courseInfo.description}</p>
               <div className="flex justify-center mt-8">
-                <div className="w-full md:w-3/4">
-                  {console.log(courseInfo)}
-                  {
-                  }
-
-                  
+                <div className="w-full md:w-3/4">                  
                   {availabilities.length > 0 
                     ? <Calendar availabilities={availabilities} canEdit={false} functionClickOnTime={handleClickOnTime} />
                     : "Cargando..."

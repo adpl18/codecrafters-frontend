@@ -25,5 +25,6 @@ export const API = {
   POST_RESERVATION: () => `${process.env.REACT_APP_API_URL}reservations/`,
   PUT_RESERVATION_CANCEL: reservationId => `${process.env.REACT_APP_API_URL}reservations/cancel/${reservationId}`,
   GET_RESERVATION_COURSE: courseId => `${process.env.REACT_APP_API_URL}reservations/course/${courseId}`,
+  GET_RESERVATION_USER: userId => `${process.env.REACT_APP_API_URL}reservations/user/${userId}`,
 };
 export default API;

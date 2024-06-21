@@ -15,7 +15,6 @@ export default function Course() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
-  const [selectedFormattedDate, setSelectedFormattedDate] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState({});
 
   useEffect(() => {
@@ -26,7 +25,6 @@ export default function Course() {
   }, []);
 
   const fetchUserInfo = async () => {
-    console.log("aca andamos")
     const accessToken = sessionStorage.getItem('accessToken');
     if (accessToken) {
       try {
@@ -54,30 +52,9 @@ export default function Course() {
       });
   }
   
-  // const fetchReservations = async (availabilities) => {
-  //   get(API.GET_RESERVATIONS())
-  //     .then((response) => {             
-  //       const reservationsFilters = response.reservations
-  //         .filter(reservation => availabilities.some(avail => avail.id === reservation.availabilityId));
-
-  //       const reservationsDictionary = reservationsFilters.reduce((dict, reservation) => {
-  //           dict[reservation.availabilityId] = reservation;
-  //           return dict;
-  //       }, {});
-
-  //       serReservations(reservationsDictionary);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     }
-  //   );
-  // }
-
   const fetchAvailabilities = async (userId) => {
     get(API.GET_AVAILABILITIES_USER(userId))
       .then(data => {
-        console.log("avaiiii", data.availabilities)
-        // fetchReservations(data.availabilities);
         setAvailabilities(data.availabilities);
         setIsLoading(false);
       })
@@ -87,8 +64,10 @@ export default function Course() {
   }
 
   const handleClickOnTime = (time, day, formattedDate) => {
-    console.log("ACAAAA", time)
-    setSelectedFormattedDate(formattedDate);
+    if (backendUserInfo.id === courseInfo.userId) {
+      alert("No puedes reservar un horario de tu propio curso");
+      return
+    }
     setSelectedDay(day);
     setSelectedTimeRange(time);
     setIsModalOpen(true);
@@ -96,16 +75,13 @@ export default function Course() {
     
   const handleClickReserve = async () => {
     setIsModalOpen(false);
-    console.log(selectedFormattedDate)
-    console.log(backendUserInfo.id, selectedTimeRange.id)
-    // Reservar horario
     const response = await post(API.POST_RESERVATION(), {courseId: id, userId: backendUserInfo.id, availabilityId: selectedTimeRange.id}, "Se ha reservado el horario correctamente")
     if (response.ok) {
       await put(API.PUT_UPDATE_AVAILABILITIES(selectedTimeRange.id), {isAvailable: false});
       fetchAvailabilities(courseInfo.userId);
     }
   }
-  console.log(courseInfo)
+
   return (
     isLoading 
       ?
@@ -124,7 +100,14 @@ export default function Course() {
               <p className="text-center text-gray-500">Profesor: {courseInfo.User.firstName} {courseInfo.User.lastName}</p>
               <div className="flex justify-center mt-8">
                 <div className="w-full md:w-3/4">
+                  {console.log(courseInfo)}
+                  {
+                  }
+
+                  
                   {availabilities.length > 0 
+                    // ? backendUserInfo.id === courseInfo.userId 
+                      // ? <Calendar availabilities={availabilities} canEdit={true} functionClickOnTime={handleClickOnTime} functionClickAdd={handleClickAddTime}/>
                     ? <Calendar availabilities={availabilities} canEdit={false} functionClickOnTime={handleClickOnTime} />
                     : "Cargando..."
                   }

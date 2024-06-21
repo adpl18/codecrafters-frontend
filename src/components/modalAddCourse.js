@@ -15,8 +15,6 @@ function ModalAddCourse({closeModal, reload, courseInfo}) {
   const [selectedArea, setSelectedArea] = useState(courseInfo?.category || '');
   const [priceCourse, setPriceCourse] = useState(courseInfo?.price || '');
   const navigate = useNavigate();
-
-  console.log(courseInfo)
   
   useEffect(() => {
     fetchUserInfo();
@@ -47,7 +45,6 @@ function ModalAddCourse({closeModal, reload, courseInfo}) {
   }
 
   const handleClickSaveCourse = async () => {
-    console.log(selectedArea, courseName, courseDescription, priceCourse);
     const data = {
       name: courseName,
       price: priceCourse,

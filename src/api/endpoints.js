@@ -4,6 +4,7 @@ export const API = {
   GET_COURSE: courseId => `${process.env.REACT_APP_API_URL}courses/${courseId}`,
   GET_COURSES_USER: userId => `${process.env.REACT_APP_API_URL}courses/teacher/${userId}`,
   POST_COURSE: () => `${process.env.REACT_APP_API_URL}courses`,
+  PUT_COURSE: courseId => `${process.env.REACT_APP_API_URL}courses/${courseId}`,
 
   // Endpoints para usuarios
   GET_USER: userId => `${process.env.REACT_APP_API_URL}users/${userId}`,
@@ -18,6 +19,13 @@ export const API = {
   GET_AVAILABILITIES_USER: userId => `${process.env.REACT_APP_API_URL}availabilities/user/${userId}`,
   PUT_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/${availabilityId}`,
   DELETE_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/${availabilityId}`,
-  PUT_CANCEL_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/cancel/${availabilityId}`,
+  PUT_UPDATE_AVAILABILITIES: availabilityId => `${process.env.REACT_APP_API_URL}availabilities/update-status/${availabilityId}`,
+
+  // Endpoints para reservas
+  GET_RESERVATIONS: () => `${process.env.REACT_APP_API_URL}reservations/`,
+  POST_RESERVATION: () => `${process.env.REACT_APP_API_URL}reservations/`,
+  PUT_RESERVATION_CANCEL: reservationId => `${process.env.REACT_APP_API_URL}reservations/cancel/${reservationId}`,
+  GET_RESERVATION_COURSE: courseId => `${process.env.REACT_APP_API_URL}reservations/course/${courseId}`,
+  GET_RESERVATION_USER: userId => `${process.env.REACT_APP_API_URL}reservations/user/${userId}`,
 };
 export default API;

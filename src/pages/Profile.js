@@ -6,25 +6,28 @@ import Modal from 'react-modal';
 import { deleteUser } from '../auth/authService';
 import API from '../api/endpoints';
 import { get, post, put, remove } from '../api/functions';
-import plus from '../assets/images/plus.png';
-import { optionsHours, daysOfWeekCompleteName, daysOfWeekNumber } from '../config';
+import { optionsHours, daysOfWeekCompleteName } from '../config';
 import Login from './Login';
 import { logout } from '../auth/authService';
+import Calendar from '../components/calendar';
 
 export default function Profile() {
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [backendUserInfo, setBackendUserInfo] = useState(null);
-  const [courses, setCourses] = useState([{}]);
+  const [courses, setCourses] = useState([]);
   const today = new Date();
   const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedFormattedDate, setSelectedFormattedDate] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(null);
   const [availabilitiesTimes, setAvailabilitiesTimes] = useState([]);
   const navigate = useNavigate();
-  const availabilitiesByDay = {'Lu': [], 'Ma': [], 'Mi': [], 'Ju': [], 'Vi': [], 'Sa': [], 'Do': []};
+  const [availabilitiesByDay, setAvailabilitiesByDay] = useState({'Lu': [], 'Ma': [], 'Mi': [], 'Ju': [], 'Vi': [], 'Sa': [], 'Do': []});
+  const [reservations, setReservations] = useState([])
+  const [myReservations, setMyReservations] = useState([])
 
   useEffect(() => {
     fetchUserInfo();
@@ -33,8 +36,34 @@ export default function Profile() {
     getStartAndEndDateOfWeek();
     fetchAvailabilities();
     fetchCourses();
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
+
+  const fetchMyReservations = async (userId) => {
+    get(API.GET_RESERVATION_USER(userId))
+      .then((response) => {
+        setMyReservations(response.reservations);
+      })
+      .catch((error) => {
+        console.error(error);
+      }
+    );
+  }
+
+  const fetchReservations = async (availabilities) => {
+    get(API.GET_RESERVATIONS())
+      .then((response) => {
+        const reservationsFilters = response.reservations.filter(reservation => {
+          return availabilities.some(avail => avail.id === reservation.availabilityId);
+        });     
+        setReservations(reservationsFilters);
+      })
+      .catch((error) => {
+        console.error(error);
+      }
+    );
+  }
 
   const fetchUserInfo = async () => {
     const accessToken = sessionStorage.getItem('accessToken');
@@ -45,6 +74,7 @@ export default function Profile() {
         .then((response) => {
           setBackendUserInfo(response.user);
           setUserInfo(userResponse);
+          fetchMyReservations(response.user.id);
           setIsLoading(false);
         })
         .catch((error) => {
@@ -63,6 +93,7 @@ export default function Profile() {
       get(API.GET_AVAILABILITIES_USER(backendUserInfo.id))
         .then((response) => {
           setAvailabilitiesTimes(response.availabilities);
+          fetchReservations(response.availabilities);
         })
         .catch((error) => {
           console.error(error);
@@ -83,22 +114,6 @@ export default function Profile() {
       );
     }
   }
-
-  // Filtro y orden de las horas por días de semana
-  const filteredAvailabilities = availabilitiesTimes.filter(availability => {
-    const availabilityDate = new Date(availability.date);
-    return availabilityDate >= currentWeek.start && availabilityDate <= currentWeek.end;
-  });
-
-  filteredAvailabilities.forEach(availability => {
-    const date = new Date(availability.date);
-    const dayOfWeek = Object.keys(daysOfWeekNumber).find(day => daysOfWeekNumber[day] === date.getDay());
-    availabilitiesByDay[dayOfWeek].push(availability);
-  });
-
-  Object.keys(availabilitiesByDay).forEach(day => {
-    availabilitiesByDay[day].sort((a, b) => a.startTime.localeCompare(b.startTime));
-  });
 
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, '0');
@@ -127,37 +142,32 @@ export default function Profile() {
     navigate("/edit-profile", { state: { userId: backendUserInfo?.id } });
   };
 
-  const handleClickOpenModal = (day) => {
+  const handleClickAddTime = (day, formattedDate, availabilitiesByDay) => {
+    setAvailabilitiesByDay(availabilitiesByDay);
+    setSelectedFormattedDate(formattedDate);
     setSelectedDay(day);
     setSelectedTimeRange({});
     setIsModalOpen(true);
   };
 
-  const handleClickOpenModalEdit = (time, day) => {
+  const handleClickOnTime = (time, day, formattedDate) => {
+    setSelectedFormattedDate(formattedDate);
     setSelectedDay(day);
     setSelectedTimeRange(time);
     setIsModalEditOpen(true);
   };
 
   const handleClickSaveDate = async () => {
-    if (selectedDay && selectedTimeRange) {
-      //  Obtner el número que representa el día de la semana
-      const numberDay = daysOfWeekNumber[selectedDay];
-      const selectedDate = new Date(currentWeek.start);
-      selectedDate.setDate(selectedDate.getDate() + numberDay);
-      const formattedDate = selectedDate.toISOString().split('T')[0];
-      const newTime = { date: formattedDate, startTime: selectedTimeRange.startTime, endTime: selectedTimeRange.endTime, isAvailable: true, userId: backendUserInfo.id };
-      await post(API.POST_AVAILABILITIES(), newTime, "Horario agregado correctamente");
-      fetchAvailabilities();
-      setIsModalOpen(false);
-    }
+    const newTime = { date: selectedFormattedDate, startTime: selectedTimeRange.startTime, endTime: selectedTimeRange.endTime, isAvailable: true, userId: backendUserInfo.id };
+    await post(API.POST_AVAILABILITIES(), newTime, "Horario agregado correctamente");
+    fetchAvailabilities();
+    setIsModalOpen(false);
   };
 
   const handleClickBlock = async () => {
     const newTime = { ...selectedTimeRange };
     newTime.isAvailable = !selectedTimeRange.isAvailable;
-    await put(API.PUT_CANCEL_AVAILABILITIES(selectedTimeRange.id), {}, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
-    // await put(API.PUT_AVAILABILITIES(newTime.id), newTime, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
+    await put(API.PUT_UPDATE_AVAILABILITIES(selectedTimeRange.id), {isAvailable: !selectedTimeRange.isAvailable}, `Horario ${selectedTimeRange.isAvailable ? "bloqueado" : "desbloqueado"} correctamente`);
     setIsModalEditOpen(false);
     fetchAvailabilities();
   };
@@ -178,15 +188,10 @@ export default function Profile() {
 
         const response = await remove(API.DELETE_USER(backendUserInfo?.id));
         
-        // const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${backendUserInfo?.id}`, {
-        //   method: 'DELETE',
-        // });
-  
         if (response.ok) {
           logout();
           setUserInfo(null);
           navigate("/");
-          console.log("USUARIO ELIMINADO CORRECTAMENTE EN EL BACKEND")
         } else {
           throw new Error('Failed to delete user on backend');
         }
@@ -194,6 +199,11 @@ export default function Profile() {
         alert(`Error al eliminar la cuenta: ${error.message}`);
       }
     }
+  };
+
+  const handleClickCancelReservation = async (reservation) => {
+    await put(API.PUT_RESERVATION_CANCEL(reservation.id), {}, "Reserva cancelada correctamente");
+    fetchReservations(availabilitiesTimes);
   };
 
   return (
@@ -236,41 +246,93 @@ export default function Profile() {
               ) : null}
             </div>
           </div>
-          <div className="w-2/3 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl">
-            <div>Semana del {currentWeek ? `${formatDate(currentWeek.start)} - ${formatDate(currentWeek.end)}` : "Cargando..."}</div>
-            <div className="grid grid-cols-7 gap-0.5">
-              {Object.keys(availabilitiesByDay).map((day, index) => (
-                <div key={index} className="bg-white-200 text-center py-4">{day}</div>
-              ))}
-              <div className="bg-gray-500 h-1 col-span-7"></div>
-              
-              {Object.entries(availabilitiesByDay).map(([day, hours], index) => (
-                <div key={index} className="bg-white-200 flex flex-col items-center py-4">
-                  {hours.map((hour, indexHour) => (
-                    <div key={indexHour} className="bg-gray-200 text-center py-2 px-4 rounded-full m-1 cursor-pointer" style={{ width: '130px' }} onClick={() => handleClickOpenModalEdit(hour, day)}>
-                      {hour.startTime.slice(0, 5)} - {hour.endTime.slice(0, 5)}
-                    </div>
-                  ))}
-                  <img onClick={() => handleClickOpenModal(day)} src={plus} alt="Agregar horario" className="w-7 h-7" /> 
-                </div>
-              ))}
-            </div>
+          <div className="w-3/4 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl">
+            <Calendar availabilities={availabilitiesTimes} canEdit={true} functionClickOnTime={handleClickOnTime} functionClickAdd={handleClickAddTime}/>
           </div>
         </div>
       </div>
+
+      {/* Mis cursos */}
       <div>
         {courses.length > 0 ? (
           <div>
             <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis Cursos</h1>
-            <div className="flex justify-center text-center space-x-4 w-full p-10">
+            <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
               {courses.map((course, index) => (
-              <div key={index} className="w-1/3 bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl" onClick={() => navigate(`/course/${course.id}`)}>
-                <div className="text-center">
-                    <div className="space-y-4">
-                      <p><span className="font-bold">Nombre:</span> {course.name}</p>
-                      <p><span className="font-bold">Precio:</span> {course.price}</p>
-                      <p><span className="font-bold">Descripción:</span> {course.description}</p>
+                <div key={index} className="w-1/5 mb-8">
+                  <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full" onClick={() => navigate(`/course/${course.id}`)}>
+                    <div className="text-center">
+                      <div className="space-y-4">
+                        <p><span className="font-bold">Nombre:</span> {course.name}</p>
+                        <p><span className="font-bold">Precio:</span> {course.price}</p>
+                        <p><span className="font-bold">Descripción:</span> {course.description}</p>
+                      </div>
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      {/* Mis reservas */}
+      <div>
+        {reservations.length > 0 ? (
+          <div>
+            <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis próximas clases</h1>
+            <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
+              {reservations.map((reservation, index) => (
+                <div key={index} className="w-1/3 mb-8">
+                  <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">                    
+                    <div className="text-center">
+                      <div className="space-y-4">
+                      <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
+                        <p><span className="font-bold">Nombre alumno: </span>{reservation.User.firstName} {reservation.User.lastName}</p>
+                        <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
+                        <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                        <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
+                        <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
+                      </div>
+                    </div>
+                    {!reservation.isCancelled 
+                      ? <button onClick={() => handleClickCancelReservation(reservation)} className="w-full py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
+                          Cancelar
+                        </button>
+                      : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div> 
+                    }
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      {/* Mis solicitudes */}
+      <div>
+        {myReservations.length > 0 ? (
+          <div>
+            <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis solicitudes</h1>
+            <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
+              {myReservations.map((reservation, index) => (
+                <div key={index} className="w-1/3 mb-8">
+                  <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full" >                    
+                    <div className="text-center">
+                      <div className="space-y-4">
+                        <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
+                        <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
+                        <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                        <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
+                        <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
+                      </div>
+                    </div>
+                    {!reservation.isCancelled 
+                      ? <button onClick={() => handleClickCancelReservation(reservation)} className="w-full py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
+                          Cancelar
+                        </button>
+                      : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div> 
+                    }
                   </div>
                 </div>
               ))}
@@ -290,7 +352,7 @@ export default function Profile() {
           },
           content: {
             width: '50%',
-            height: '55%',
+            height: '70%',
             margin: 'auto',
             backgroundColor: 'white',
             padding: '20px',
@@ -306,7 +368,7 @@ export default function Profile() {
             <Dropdown 
               placeholder={"Elegir horario"}
               options={optionsHours} 
-              optionsSelected={availabilitiesByDay[selectedDay]}
+              optionsSelected={availabilitiesByDay[selectedDay] ? availabilitiesByDay[selectedDay] : []}
               onSelect={(selectedOption) => setSelectedTimeRange(selectedOption)}
             />
           </div>
@@ -327,8 +389,8 @@ export default function Profile() {
             backgroundColor: 'rgba(0, 0, 0, 0.5)'
           },
           content: {
-            width: '40%',
-            height: '30%',
+            width: '50%',
+            height: '40%',
             margin: 'auto',
             backgroundColor: 'white',
             padding: '20px',

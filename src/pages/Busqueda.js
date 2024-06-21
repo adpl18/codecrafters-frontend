@@ -5,6 +5,7 @@ import { get } from '../api/functions';
 import API from '../api/endpoints';
 import profileIcon from "../assets/images/user.png";
 import { categoryOptions } from '../config';
+import { useNavigate } from 'react-router-dom';
 
 export default function Busqueda() {
   const [courses, setCourses] = useState([]);
@@ -13,7 +14,7 @@ export default function Busqueda() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedPriceRange, setSelectedPriceRange] = useState(null);
   const location = useLocation();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -103,7 +104,7 @@ export default function Busqueda() {
 
   return (
     <div className="min-h-screen flex ">
-      <div className="w-1/7 flex flex-col justify-center items-start p-8">
+      <div className="w-1/7 flex flex-col justify-center items-start p-8 fixed left-0 h-screen">
         <form className="w-full max-w-md h-[70%]" onSubmit={handleSearch}>
           <div className="space-y-4">
             <button
@@ -144,7 +145,7 @@ export default function Busqueda() {
         </form>
       </div>
 
-      <div className="flex-grow flex flex-col items-center justify-center p-8">
+      <div className="flex-grow flex flex-col items-center justify-center p-8 ml-9">
         {error && <p className="text-red-500 text-center mt-4">{error}</p>}
         <div className="mt-10">
           {courses.length === 0 ? (
@@ -152,7 +153,7 @@ export default function Busqueda() {
           ) : (
             <div className="space-y-4">
               {courses.map(course => (
-                <div key={course.id} className="p-8 bg-white rounded-lg shadow-md flex items-stretch" style={{width: '50vw'}}>
+                <div key={course.id} className="p-8 bg-white rounded-lg shadow-md flex items-stretch" style={{width: '50vw'}} onClick={() => navigate(`/course/${course.id}`)}>
                   <div className="mr-4 bg-pink-500 rounded-full flex items-center justify-center" style={{flex: '0 0 auto', width: 'calc(100% * 1/3)', maxWidth: '200px', height: '200px'}}>
                     <img src={profileIcon} alt="Profile" className="rounded-full border-2 border-pink-500 object-cover" style={{maxWidth: '100%', maxHeight: '100%'}}/>
                   </div>

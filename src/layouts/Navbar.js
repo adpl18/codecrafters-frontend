@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import profile from "../assets/images/profile.png";
 import Modal from 'react-modal';
 import ModalAddCourse from "../components/modalAddCourse";
 
 function Navbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const location = useLocation();
 
     return (
       <div className="bg-white m-5 p-5 shadow-lg rounded-2xl align-center justify-center">
@@ -61,7 +62,7 @@ function Navbar() {
             backgroundColor: 'rgba(0, 0, 0, 0.5)'
           },
           content: {
-            width: '40%',
+            width: '50%',
             height: 'auto',
             maxWidth: '80%',
             maxHeight: '80%',
@@ -72,7 +73,7 @@ function Navbar() {
           }
         }}
       >
-        <ModalAddCourse closeModal={() => setIsModalOpen(false)}/>
+        <ModalAddCourse closeModal={() => setIsModalOpen(false)} reload={location.pathname === '/profile' ? true : false} />
       </Modal>
       </div>
     );

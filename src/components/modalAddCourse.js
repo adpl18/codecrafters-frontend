@@ -2,19 +2,21 @@ import React, { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { getUserInfo } from '../auth/authService';
-import { get, post } from '../api/functions';
+import { get, post, put } from '../api/functions';
 import API from '../api/endpoints';
 import Dropdown from './dropdown';
 import { categoryOptions } from '../config';
 
-function ModalAddCourse({closeModal}) {
+function ModalAddCourse({closeModal, reload, courseInfo}) {
   const [isLoading, setIsLoading] = useState(true);
   const [backendUserInfo, setBackendUserInfo] = useState(false);
-  const [courseName, setCourseName] = useState('');
-  const [courseDescription, setCourseDescription] = useState('');
-  const [selectedArea, setSelectedArea] = useState('');
-  const [priceCourse, setPriceCourse] = useState('');
+  const [courseName, setCourseName] = useState(courseInfo?.name || '');
+  const [courseDescription, setCourseDescription] = useState(courseInfo?.description || '');
+  const [selectedArea, setSelectedArea] = useState(courseInfo?.category || '');
+  const [priceCourse, setPriceCourse] = useState(courseInfo?.price || '');
   const navigate = useNavigate();
+
+  console.log(courseInfo)
   
   useEffect(() => {
     fetchUserInfo();
@@ -54,9 +56,18 @@ function ModalAddCourse({closeModal}) {
       userId: backendUserInfo.id
     }
 
-    const response = await post(API.POST_COURSE(), data, "Curso creado exitosamente");
+    let response = {}
+    if (courseInfo) {
+      response = await put(API.PUT_COURSE(courseInfo.id), data, "Curso editado exitosamente");
+    } else {
+      response = await post(API.POST_COURSE(), data, "Curso creado exitosamente");
+    }
+
     if (response.ok) {
       closeModal();
+      if (reload) {
+        window.location.reload()
+      }
     } else {
       console.error("Error al crear el curso");
     }
@@ -81,7 +92,7 @@ function ModalAddCourse({closeModal}) {
             />
             <div className="flex mt-8 justify-between">
               <Dropdown 
-                placeholder={"Elegir área"} 
+                placeholder={courseInfo?.category || "Elegir área"} 
                 options={categoryOptions}
                 onSelect={(selectedOption) => setSelectedArea(selectedOption)} 
               />
@@ -107,7 +118,7 @@ function ModalAddCourse({closeModal}) {
               />
             </div>
             <button onClick={handleClickSaveCourse} className="block mx-auto mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-              Crear curso
+              {courseInfo ? "Editar" : "Crear curso"}
             </button>
           </div>
         : handleClickFunction()
@@ -116,6 +127,8 @@ function ModalAddCourse({closeModal}) {
 
 ModalAddCourse.propTypes = {
   closeModal: PropTypes.func.isRequired,
+  reload: PropTypes.bool.isRequired,
+  courseInfo: PropTypes.bool,
 };
 
 export default ModalAddCourse;

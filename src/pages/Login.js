@@ -58,6 +58,8 @@ export default function Login() {
           email,
           birthdate,
       })
+
+      console.log('RESPUESTA DEL BACKEND:', response);
   
       if (response.ok) {
         setIsConfirming(true);

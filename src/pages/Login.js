@@ -48,12 +48,11 @@ export default function Login() {
     }
     try {
       // Llamada al backend para validar y crear el usuario
-      const response = await post(API.POST_USER(), 
-        {
-          firstName: name,
-          lastName: family_name,
-          email,
-          birthdate,
+      const response = await post(API.POST_USER(), {
+        firstName: name,
+        lastName: family_name,
+        email,
+        birthdate,
       });
   
       if (response.ok) {
@@ -61,7 +60,16 @@ export default function Login() {
         await signUp(email, password, birthdate, family_name, name);
         setIsConfirming(true);
       } else {
-        throw new Error('Failed to create user on backend');
+        let errorMessage = 'Failed to create user on backend';
+        try {
+          const errorResponse = await response.json();
+          if (errorResponse.error === 'You must be at least 18 years old to sign up.') {
+            errorMessage = 'Debes ser mayor de 18 años para crear una cuenta';
+          }
+        } catch (e) {
+          console.error('Failed to parse JSON response:', e);
+        }
+        alert(errorMessage);
       }
     } catch (error) {
       alert(`Sign up failed: ${error.message}`);

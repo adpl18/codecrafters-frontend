@@ -47,19 +47,18 @@ export default function Login() {
       return;
     }
     try {
-      // Registro en AWS Cognito
-      await signUp(email, password, birthdate, family_name, name);
-      
-      // Llamada al backend para crear el usuario
+      // Llamada al backend para validar y crear el usuario
       const response = await post(API.POST_USER(), 
         {
           firstName: name,
           lastName: family_name,
           email,
           birthdate,
-      })
+      });
   
       if (response.ok) {
+        // Registro en AWS Cognito solo si el usuario se creó exitosamente en el backend
+        await signUp(email, password, birthdate, family_name, name);
         setIsConfirming(true);
       } else {
         throw new Error('Failed to create user on backend');

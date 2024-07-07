@@ -43,24 +43,22 @@ export default function TeacherProfile() {
         </div>
       </div>
       : teacherInfo ?
-        <div className="flex justify-center m-10">
-          <div className="bg-white p-10 rounded-lg shadow-xl w-full">
-            <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">{teacherInfo.name} {teacherInfo.family_name}</h1>
-            <div className="text-center">
-              <p><span className="font-bold">Email:</span> {teacherInfo.email}</p>
-              <p><span className="font-bold">Día de Nacimiento:</span> {new Date(teacherInfo.birthdate).toLocaleDateString()}</p>
-            </div>
-            <h1 className="text-3xl font-bold text-center text-gray-900 mb-4 mt-8">Cursos Impartidos</h1>
-            <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
+        <div className="flex flex-col items-center p-10">
+          <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl w-full max-w-md text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">{teacherInfo.firstName} {teacherInfo.lastName}</h1>
+            <p><span className="font-bold">Email:</span> {teacherInfo.email}</p>
+            <p><span className="font-bold">Día de Nacimiento:</span> {new Date(teacherInfo.birthdate).toLocaleDateString()}</p>
+          </div>
+          <div className="w-full bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl">
+            <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Cursos Impartidos</h1>
+            <div className="flex flex-wrap justify-center text-center">
               {courses.length > 0 ? courses.map((course, index) => (
-                <div key={index} className="w-1/5 mb-8">
-                  <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full" onClick={() => navigate(`/course/${course.id}`)}>
-                    <div className="text-center">
-                      <div className="space-y-4">
-                        <p><span className="font-bold">Nombre:</span> {course.name}</p>
-                        <p><span className="font-bold">Precio:</span> {course.price}</p>
-                        <p><span className="font-bold">Descripción:</span> {course.description}</p>
-                      </div>
+                <div key={index} className="w-full md:w-1/2 lg:w-1/4 mb-8 p-4">
+                  <div className="bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl h-full cursor-pointer" onClick={() => navigate(`/course/${course.id}`)}>
+                    <div className="space-y-4">
+                      <p><span className="font-bold">Nombre:</span> {course.name}</p>
+                      <p><span className="font-bold">Precio:</span> {course.price}</p>
+                      <p><span className="font-bold">Descripción:</span> {course.description}</p>
                     </div>
                   </div>
                 </div>

@@ -47,24 +47,33 @@ export default function Login() {
       return;
     }
     try {
-      // Registro en AWS Cognito
-      await signUp(email, password, birthdate, family_name, name);
-      
-      // Llamada al backend para crear el usuario
-      const response = await post(API.POST_USER(), 
-        {
-          firstName: name,
-          lastName: family_name,
-          email,
-          birthdate,
-      })
-
-      console.log('RESPUESTA DEL BACKEND:', response);
+      // Llamada al backend para validar y crear el usuario
+      const response = await post(API.POST_USER(), {
+        firstName: name,
+        lastName: family_name,
+        email,
+        birthdate,
+      });
   
       if (response.ok) {
+        // Registro en AWS Cognito solo si el usuario se creó exitosamente en el backend
+        await signUp(email, password, birthdate, family_name, name);
         setIsConfirming(true);
       } else {
-        throw new Error('Failed to create user on backend');
+        // Parse the response JSON body to get the error message
+        let errorMessage = 'Failed to create user on backend';
+        console.error('Failed to create user on backend:', response.data.error);
+        try {
+          const errorResponse = response.data;
+          if (response.data.error == 'You must be at least 18 years old to sign up.') {
+            errorMessage = 'Debes ser mayor de 18 años para crear una cuenta';
+          } else {
+            errorMessage = `Failed to create user on backend: ${errorResponse.error}`;
+          }
+        } catch (e) {
+          console.error('Failed to parse JSON response:', e);
+        }
+        alert(errorMessage);
       }
     } catch (error) {
       alert(`Sign up failed: ${error.message}`);

@@ -10,7 +10,7 @@ export const API = {
   // Endpoints para usuarios
   GET_USER: userId => `${process.env.REACT_APP_API_URL}users/${userId}`,
   GET_USER_EMAIL: userEmail => `${process.env.REACT_APP_API_URL}users/email/${userEmail}`,
-  POST_USER: () => `${process.env.REACT_APP_API_URL}users/`,
+  POST_USER: () => `${process.env.REACT_APP_API_URL}users`,
   DELETE_USER: userId => `${process.env.REACT_APP_API_URL}users/${userId}`,
   PUT_USER: userId => `${process.env.REACT_APP_API_URL}users/${userId}`,
 

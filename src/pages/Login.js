@@ -60,11 +60,15 @@ export default function Login() {
         await signUp(email, password, birthdate, family_name, name);
         setIsConfirming(true);
       } else {
+        // Parse the response JSON body to get the error message
         let errorMessage = 'Failed to create user on backend';
+        console.error('Failed to create user on backend:', response.data.error);
         try {
-          const errorResponse = await response.json();
-          if (errorResponse.error === 'You must be at least 18 years old to sign up.') {
+          const errorResponse = response.data;
+          if (response.data.error == 'You must be at least 18 years old to sign up.') {
             errorMessage = 'Debes ser mayor de 18 años para crear una cuenta';
+          } else {
+            errorMessage = `Failed to create user on backend: ${errorResponse.error}`;
           }
         } catch (e) {
           console.error('Failed to parse JSON response:', e);

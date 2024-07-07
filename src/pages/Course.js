@@ -110,6 +110,14 @@ export default function Course() {
     }
   };
 
+  const handleProfessorClick = () => {
+    if (backendUserInfo?.id === courseInfo.userId) {
+      navigate("/profile");
+    } else {
+      navigate(`/profile/${courseInfo.userId}`);
+    }
+  };
+
   return (
     isLoading 
       ?
@@ -135,7 +143,11 @@ export default function Course() {
                 </div>
               : null}
               <h1 className="text-2xl font-bold text-center">{courseInfo.name}</h1>
-              <p className="text-center text-gray-500">Profesor: {courseInfo.User.firstName} {courseInfo.User.lastName}</p>
+              <p className="text-center text-gray-500">
+                Profesor: <span className=" hover:underline cursor-pointer" onClick={handleProfessorClick}>
+                  {courseInfo.User.firstName} {courseInfo.User.lastName}
+                </span>
+              </p>
               <p className="text-center text-gray-500">Precio: {courseInfo.price}</p>
               <p className="text-center text-gray-500">Categoría: {courseInfo.category}</p>
               <p className="text-center text-gray-500">{courseInfo.description}</p>

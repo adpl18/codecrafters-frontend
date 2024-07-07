@@ -158,8 +158,21 @@ export default function Busqueda() {
                     <img src={profileIcon} alt="Profile" className="rounded-full border-2 border-pink-500 object-cover" style={{maxWidth: '100%', maxHeight: '100%'}}/>
                   </div>
                   <div className='text-left'>
-                    <p className="mt-2 font-semibold text-3xl">{course.User ? `${course.User.firstName} ${course.User.lastName}` : 'Unknown'}</p>
-                    <h3 className="text-gray-600 text-3xl">{course.name}</h3>
+                    <p 
+                      className="mt-2 font-semibold text-3xl hover:underline cursor-pointer" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/profile/${course.User.id}`);
+                      }}
+                    >
+                      {course.User ? `${course.User.firstName} ${course.User.lastName}` : 'Unknown'}
+                    </p>
+                    <h3 
+                      className="text-gray-600 text-3xl cursor-pointer" 
+                      onClick={() => navigate(`/course/${course.id}`)}
+                    >
+                      {course.name}
+                    </h3>
                     <p className="mt-2 text-gray-600 text-3xl">{course.category}</p>
                     <p className="mt-2 text-gray-600 text-3xl">{course.description}</p>
                     <p className="mt-2 text-gray-600 text-3xl">${course.price}</p>

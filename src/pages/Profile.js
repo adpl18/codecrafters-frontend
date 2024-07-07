@@ -213,7 +213,6 @@ export default function Profile() {
   };
 
   const now = new Date();
-  // console.log(new Date(myReservations[4].Availability.)
   const canceledReservations = myReservations.filter(reservation => reservation.isCancelled);
   const upcomingReservations = myReservations.filter(reservation => !reservation.isCancelled
      && new Date(`${reservation.Availability.date}T${reservation.Availability.startTime}`) > now);
@@ -267,16 +266,6 @@ export default function Profile() {
       </div>
 
       <div>
-      {/* Toggle Button */}
-      {/* <div className="text-center mb-4">
-        <button
-          onClick={toggleView}
-          className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline"
-        >
-          {isTeacherView ? 'Switch to Student View' : 'Switch to Teacher View'}
-        </button>
-        
-      </div> */}
       <ToggleButton isTeacherView={isTeacherView} toggleView={toggleView} /> 
 
       {/* Teacher View */}
@@ -413,12 +402,6 @@ export default function Profile() {
                               <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
                             </div>
                           </div>
-                          {/* {!reservation.isCancelled 
-                            ? <button onClick={() => handleClickCancelReservation(reservation)} className="w-full py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
-                                Cancelar
-                              </button>
-                            : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div> 
-                          } */}
                         </div>
                       </div>
                     ))}

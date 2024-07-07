@@ -36,7 +36,8 @@ export async function post(url, data, msg=null) {
     if (!response.ok) {
       toast.error("Ha ocurrido un error en el envío");
       console.log("Error: ", response.status, response.statusText)
-      return { ok: false }
+      const dataResponse = await response.json();
+      return { data: dataResponse, ok: false }
     } else {
       const dataResponse = await response.json();
       if (msg) {

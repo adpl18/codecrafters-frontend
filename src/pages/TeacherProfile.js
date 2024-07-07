@@ -12,6 +12,8 @@ export default function TeacherProfile() {
 
   useEffect(() => {
     fetchTeacherInfo();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchTeacherInfo = async () => {

@@ -48,6 +48,12 @@ export default function EditProfile() {
     ];
   
     try {
+      // throw error if birthdate is of a under 18 years old
+      if ( new Date().getFullYear() - new Date(birthdate).getFullYear() < 18) {
+        alert('Debes ser mayor de edad');
+        return;
+      }
+      
       // Actualiza en AWS Cognito
       await updateUserAttributes(accessToken, attributes);
       

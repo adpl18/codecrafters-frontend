@@ -68,9 +68,19 @@ function Calendar({ availabilities, canEdit, functionClickOnTime, functionClickA
   }
 
   const handleClickOnTime = (hour, day) => {
+    if (hasHourPassed(hour, day)) return;
     if (!hour.isAvailable && !canEdit) return;
     functionClickOnTime(hour, day, getDate(day))
   }
+
+  const hasHourPassed = (hour, day) =>{
+    return new Date() > new Date(`${getDate(day)}T${hour.startTime}`);
+  }
+
+  const isGray = (hour, day) => {
+    return hasHourPassed(hour, day) || hour.isAvailable === false;
+  }
+
 
   return (
     <div>
@@ -85,8 +95,8 @@ function Calendar({ availabilities, canEdit, functionClickOnTime, functionClickA
           <div key={index} className="bg-white-200 flex flex-col items-center py-4">
             {hours.map((hour, indexHour) => (
               <div key={indexHour} 
-                className={`py-2 px-4 rounded-full m-1 text-xs ${hour.isAvailable ? 'bg-gray-200 shadow cursor-pointer' : 'bg-gray-100'}`}
-                style={{ width: '101px', color: hour.isAvailable ? 'black' : 'gray'}} 
+                className={`py-2 px-4 rounded-full m-1 text-xs ${!isGray(hour, day)? 'bg-gray-200 shadow cursor-pointer' : 'bg-gray-100'}`}
+                style={{ width: '101px', color: !isGray(hour, day) ? 'black' : 'gray'}} 
                 onClick={() => handleClickOnTime(hour, day)}
               >
                 {hour.startTime.slice(0, 5)} - {hour.endTime.slice(0, 5)}

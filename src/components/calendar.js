@@ -86,7 +86,7 @@ function Calendar({ availabilities, canEdit, functionClickOnTime, functionClickA
             {hours.map((hour, indexHour) => (
               <div key={indexHour} 
                 className={`py-2 px-4 rounded-full m-1 text-xs ${hour.isAvailable ? 'bg-gray-200 shadow cursor-pointer' : 'bg-gray-100'}`}
-                style={{ width: '101px', color: hour.isAvailable ? 'black' : 'gray'}} 
+                style={{ width: '101px', color: (hour.isAvailable || hour.isCancelled) ? 'black' : 'gray'}} 
                 onClick={() => handleClickOnTime(hour, day)}
               >
                 {hour.startTime.slice(0, 5)} - {hour.endTime.slice(0, 5)}

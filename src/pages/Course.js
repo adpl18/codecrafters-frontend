@@ -136,7 +136,7 @@ export default function Course() {
               : null}
               <h1 className="text-2xl font-bold text-center">{courseInfo.name}</h1>
               <p className="text-center text-gray-500">Profesor: {courseInfo.User.firstName} {courseInfo.User.lastName}</p>
-              <p className="text-center text-gray-500">Precio: {courseInfo.price}</p>
+              <p className="text-center text-gray-500">Precio: {courseInfo.price.toLocaleString()}</p>
               <p className="text-center text-gray-500">Categoría: {courseInfo.category}</p>
               <p className="text-center text-gray-500">{courseInfo.description}</p>
               <div className="flex justify-center mt-8">

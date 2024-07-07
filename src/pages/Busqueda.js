@@ -162,7 +162,7 @@ export default function Busqueda() {
                     <h3 className="text-gray-600 text-3xl">{course.name}</h3>
                     <p className="mt-2 text-gray-600 text-3xl">{course.category}</p>
                     <p className="mt-2 text-gray-600 text-3xl">{course.description}</p>
-                    <p className="mt-2 text-gray-600 text-3xl">${course.price}</p>
+                    <p className="mt-2 text-gray-600 text-3xl">${course.price.toLocaleString()}</p>
                   </div>
                 </div>
               ))}

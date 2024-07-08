@@ -1,23 +1,25 @@
 module.exports = {
-  "env": {
+    "env": {
       "browser": true,
       "es2021": true
-  },
-  "extends": [
+    },
+    "extends": [
       "eslint:recommended",
       "plugin:react/recommended"
-  ],
-  "parserOptions": {
+    ],
+    "parserOptions": {
       "ecmaFeatures": {
-          "jsx": true
+        "jsx": true
       },
       "ecmaVersion": "latest",
       "sourceType": "module"
-  },
-  "plugins": [
+    },
+    "plugins": [
       "react"
-  ],
-  "rules": {
-    "testing-library/prefer-screen-queries": "off"
-  },
-}
+    ],
+    "rules": {
+      "testing-library/prefer-screen-queries": "off"
+    },
+    "ignorePatterns": ["test/**"] // Ignorar todos los archivos dentro de la carpeta 'test'
+  };
+  

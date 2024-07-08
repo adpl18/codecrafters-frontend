@@ -333,10 +333,10 @@ export default function Profile() {
                           <div className="space-y-4">
                             <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
                             <p><span className="font-bold">Nombre alumno: </span>{reservation.User?.firstName} {reservation.User?.lastName}</p>
-                            <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
-                            <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
-                            <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
-                            <p><span className="font-bold">Precio: </span>${reservation.Course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
+                            <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability?.date}</p>
+                            <p><span className="font-bold">Horario reserva: </span>{reservation.Availability?.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
+                            <p><span className="font-bold">Curso: </span>{reservation.Course?.name}</p>
+                            <p><span className="font-bold">Precio: </span>${reservation.Course?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
                           </div>
                         </div>
                         {!reservation.isCancelled 
@@ -370,10 +370,10 @@ export default function Profile() {
                           <div className="text-center">
                             <div className="space-y-4">
                               <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
-                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
-                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
-                              <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
-                              <p><span className="font-bold">Precio: </span>${reservation.Course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
+                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability?.date}</p>
+                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability?.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
+                              <p><span className="font-bold">Curso: </span>{reservation.Course?.name}</p>
+                              <p><span className="font-bold">Precio: </span>${reservation.Course?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
                             </div>
                           </div>
                           {!reservation.isCancelled 
@@ -398,10 +398,10 @@ export default function Profile() {
                           <div className="text-center">
                             <div className="space-y-4">
                               <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
-                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
-                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
-                              <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
-                              <p><span className="font-bold">Precio: </span>${reservation.Course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
+                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability?.date}</p>
+                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability?.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
+                              <p><span className="font-bold">Curso: </span>{reservation.Course?.name}</p>
+                              <p><span className="font-bold">Precio: </span>${reservation.Course?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
                             </div>
                           </div>
                           <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div>
@@ -422,10 +422,10 @@ export default function Profile() {
                           <div className="text-center">
                             <div className="space-y-4">
                               <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
-                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
-                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
-                              <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
-                              <p><span className="font-bold">Precio: </span>${reservation.Course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
+                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability?.date}</p>
+                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability?.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
+                              <p><span className="font-bold">Curso: </span>{reservation.Course?.name}</p>
+                              <p><span className="font-bold">Precio: </span>${reservation.Course?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
                             </div>
                           </div>
                         </div>

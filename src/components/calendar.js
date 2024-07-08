@@ -94,6 +94,7 @@ function Calendar({ availabilities, canEdit, functionClickOnTime, functionClickA
           <div key={index} className="bg-white-200 flex flex-col items-center py-4">
             {hours.map((hour, indexHour) => (
               <div key={indexHour} 
+              data-testid="time-slot"
               className={`py-2 px-4 rounded-full m-1 text-xs ${!isGray(hour, day)? 'bg-gray-200 shadow cursor-pointer' : 'bg-gray-100'}`}
               style={{ width: '101px', color: !isGray(hour, day) ? 'black' : 'gray'}} 
               onClick={() => handleClickOnTime(hour, day)}

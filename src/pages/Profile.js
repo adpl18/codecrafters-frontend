@@ -236,10 +236,17 @@ export default function Profile() {
   };
 
   const now = new Date();
-  const canceledReservations = myReservations.filter(reservation => reservation.isCancelled);
-  const upcomingReservations = myReservations.filter(reservation => !reservation.isCancelled
+
+  const canceledReservations = reservations.filter(reservation => reservation.isCancelled);
+  const upcomingReservations = reservations.filter(reservation => !reservation.isCancelled
+      && new Date(`${reservation.Availability?.date}T${reservation.Availability?.startTime}`) > now);
+  const pastReservations = reservations.filter(reservation => !reservation.isCancelled
+      && new Date(`${reservation.Availability?.date}T${reservation.Availability?.startTime}`) <= now);
+
+  const myCanceledReservations = myReservations.filter(reservation => reservation.isCancelled);
+  const myUpcomingReservations = myReservations.filter(reservation => !reservation.isCancelled
      && new Date(`${reservation.Availability?.date}T${reservation.Availability?.startTime}`) > now);
-  const pastReservations = myReservations.filter(reservation => !reservation.isCancelled
+  const myPastReservations = myReservations.filter(reservation => !reservation.isCancelled
      && new Date(`${reservation.Availability?.date}T${reservation.Availability?.startTime}`) <= now);
 
   return (
@@ -322,68 +329,11 @@ export default function Profile() {
           <div>
             {reservations.length > 0 ? (
               <div>
-                <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis próximas clases</h1>
-                <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
-                  {reservations.map((reservation, index) => (
-                    <div key={index} className="w-1/3 mb-8">
-                      <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">
-                        <div className="text-center">
-                          <div className="space-y-4">
-                            <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
-                            <p><span className="font-bold">Nombre alumno: </span>{reservation.User?.firstName} {reservation.User?.lastName}</p>
-                            <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
-                            <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
-                            <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
-                            <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
-                          </div>
-                        </div>
-                        {!reservation.isCancelled 
-                          ? <button onClick={() => handleClickCancelReservation(reservation)} className="w-full py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
-                              Cancelar
-                            </button>
-                          : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div> 
-                        }
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </div>
-      ) : (
-        <div>
-          {/* Mis solicitudes */}
-          <div>
-            {myReservations.length > 0 ? (
-              <div>
-                <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis solicitudes</h1>
-                {/* Cancelled Reservations */}
-                <div>
-                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Canceladas</h2>
-                  <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
-                    {canceledReservations.map((reservation, index) => (
-                      <div key={index} className="w-1/3 mb-8">
-                        <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">
-                          <div className="text-center">
-                            <div className="space-y-4">
-                              <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
-                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
-                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
-                              <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
-                              <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
-                            </div>
-                          </div>
-                          <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis reservas</h1>
 
                 {/* Upcoming Reservations */}
                 <div>
-                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Próximas clases</h2>
+                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Reservas actuales</h2>
                   <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
                     {upcomingReservations.map((reservation, index) => (
                       <div key={index} className="w-1/3 mb-8">
@@ -411,9 +361,100 @@ export default function Profile() {
 
                 {/* Past Reservations */}
                 <div>
-                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Clases que asististe</h2>
+                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Clases pasadas</h2>
                   <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
                     {pastReservations.map((reservation, index) => (
+                      <div key={index} className="w-1/3 mb-8">
+                        <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">
+                          <div className="text-center">
+                            <div className="space-y-4">
+                              <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
+                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
+                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                              <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
+                              <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
+                            </div>
+                          </div>
+                          {/* {!reservation.isReviewed 
+                            ? <button onClick={() => handleOpenReviewModal(reservation)} className="w-full py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mb-4">
+                                Dejar reseña
+                              </button>
+                            : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Ya dejaste reseña</div> 
+                          } */}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Cancelled Reservations */}
+                <div>
+                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Clases Canceladas</h2>
+                  <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
+                    {canceledReservations.map((reservation, index) => (
+                      <div key={index} className="w-1/3 mb-8">
+                        <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">
+                          <div className="text-center">
+                            <div className="space-y-4">
+                              <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
+                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
+                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                              <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
+                              <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
+                            </div>
+                          </div>
+                          <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : (
+        <div>
+          {/* Mis solicitudes */}
+          <div>
+            {myReservations.length > 0 ? (
+              <div>
+                <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis solicitudes</h1>
+                
+
+                {/* Upcoming Reservations */}
+                <div>
+                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Próximas clases</h2>
+                  <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
+                    {myUpcomingReservations.map((reservation, index) => (
+                      <div key={index} className="w-1/3 mb-8">
+                        <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">
+                          <div className="text-center">
+                            <div className="space-y-4">
+                              <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
+                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
+                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                              <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
+                              <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
+                            </div>
+                          </div>
+                          {!reservation.isCancelled 
+                            ? <button onClick={() => handleClickCancelReservation(reservation)} className="w-full py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
+                                Cancelar
+                              </button>
+                            : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div> 
+                          }
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Past Reservations */}
+                <div>
+                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Clases que asististe</h2>
+                  <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
+                    {myPastReservations.map((reservation, index) => (
                       <div key={index} className="w-1/3 mb-8">
                         <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">
                           <div className="text-center">
@@ -431,6 +472,29 @@ export default function Profile() {
                               </button>
                             : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Ya dejaste reseña</div> 
                           }
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Cancelled Reservations */}
+                <div>
+                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Canceladas</h2>
+                  <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
+                    {myCanceledReservations.map((reservation, index) => (
+                      <div key={index} className="w-1/3 mb-8">
+                        <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">
+                          <div className="text-center">
+                            <div className="space-y-4">
+                              <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
+                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
+                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                              <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
+                              <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
+                            </div>
+                          </div>
+                          <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div>
                         </div>
                       </div>
                     ))}

@@ -43,7 +43,7 @@ export default function Home() {
             <div>
               <Dropdown
                 placeholder="Elegir rango de precios"
-                options={['Elegir rango de precios','Menor a 5000', 'Entre 5000 y 10000', 'Sobre 10000']}
+                options={['Elegir rango de precios','Menor a 5.000 CLP', 'Entre 5.000 y 10.000 CLP', 'Sobre 10.000 CLP']}
                 onSelect={(option) => setSelectedPriceRange(option)}
                 className="z-10"
               />

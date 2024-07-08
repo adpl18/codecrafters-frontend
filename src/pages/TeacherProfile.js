@@ -4,6 +4,7 @@ import API from '../api/endpoints';
 import { get } from '../api/functions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/fontawesome-free-solid';
+import { formatPrice } from '../utils';
 
 export default function TeacherProfile() {
   const { userId } = useParams();
@@ -67,7 +68,7 @@ export default function TeacherProfile() {
                   <div className="bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl h-full cursor-pointer" onClick={() => navigate(`/course/${course.id}`)}>
                     <div className="space-y-4">
                       <p><span className="font-bold">Nombre:</span> {course.name}</p>
-                      <p><span className="font-bold">Precio:</span> {course.price}</p>
+                      <p><span className="font-bold">Precio:</span> {formatPrice(course.price)}</p>
                       <p><span className="font-bold">Descripción:</span> {course.description}</p>
                       <p><span className="font-bold">Rating:</span> {course.averageRating !== null && course.averageRating !== undefined && course.averageRating !== -1 ? (
                         <>

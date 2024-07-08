@@ -8,6 +8,7 @@ import Modal from 'react-modal';
 import { daysOfWeekCompleteName } from '../config';
 import { useNavigate } from 'react-router-dom';
 import ModalAddCourse from '../components/modalAddCourse';
+import { formatPrice } from '../utils';
 
 export default function Course() {
   const { id } = useParams();
@@ -120,52 +121,78 @@ export default function Course() {
 
   return (
     isLoading 
-      ?
-        <div className="flex items-center justify-center min-h-screen bg-cover">
+      ? <div className="flex items-center justify-center min-h-screen bg-cover">
           <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
             <p>Loading...</p>
           </div>
         </div>
-      :
-      <div>
-        {courseInfo
-        ?
-        <div className="flex justify-center m-10">
-          <div className="bg-white p-10 rounded-lg shadow-xl w-full">
-            {backendUserInfo?.id === courseInfo.userId 
-              ? <div style={{ textAlign: 'right' }}>
-                  <button onClick={handleClickEdit} className="p-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
-                    Editar
-                  </button>
-                  <button onClick={handleDeleteCourse} className="p-4 py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4 ml-4">
-                    Eliminar
-                  </button>
-                </div>
-              : null}
-              <h1 className="text-2xl font-bold text-center">{courseInfo.name}</h1>
-              <p className="text-center text-gray-500">
-                Profesor: <span className=" hover:underline cursor-pointer" onClick={handleProfessorClick}>
-                  {courseInfo.User.firstName} {courseInfo.User.lastName}
-                </span>
-              </p>
-              <p className="text-center text-gray-500">Precio: {courseInfo.price}</p>
-              <p className="text-center text-gray-500">Categoría: {courseInfo.category}</p>
-              <p className="text-center text-gray-500">{courseInfo.description}</p>
-              <div className="flex justify-center mt-8">
-                <div className="w-full md:w-3/4">                  
-                  {availabilities.length > 0 
-                    ? <Calendar availabilities={availabilities} canEdit={false} functionClickOnTime={handleClickOnTime} />
-                    : "Cargando..."
-                  }
+      : <div>
+          {courseInfo && 
+          <div className="flex justify-center m-10">
+            <div className="bg-white p-10 rounded-lg shadow-xl w-full">
+              {backendUserInfo?.id === courseInfo.userId 
+                ? <div style={{ textAlign: 'right' }}>
+                    <button onClick={handleClickEdit} className="p-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">
+                      Editar
+                    </button>
+                    <button onClick={handleDeleteCourse} className="p-4 py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mt-4 ml-4">
+                      Eliminar
+                    </button>
+                  </div>
+                : null}
+                <h1 className="text-2xl font-bold text-center">{courseInfo.name}</h1>
+                <p className="text-center text-gray-500">
+                  Profesor: <span className=" hover:underline cursor-pointer" onClick={handleProfessorClick}>
+                    {courseInfo.User.firstName} {courseInfo.User.lastName}
+                  </span>
+                </p>
+                <p className="text-center text-gray-500">Precio: {formatPrice(courseInfo.price)}</p>
+                <p className="text-center text-gray-500">Categoría: {courseInfo.category}</p>
+                <p className="text-center text-gray-500">{courseInfo.description}</p>
+                <div className="flex justify-center mt-8">
+                  <div className="w-full md:w-3/4">                  
+                    {availabilities.length > 0 
+                      ? <Calendar availabilities={availabilities} canEdit={false} functionClickOnTime={handleClickOnTime} />
+                      : "Cargando..."
+                    }
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        : null}    
+          }
+          <Modal
+            isOpen={isModalOpen}
+            onRequestClose={() => setIsModalOpen(false)}
+            contentLabel="Editar horario"
+            ariaHideApp={false}
+            style={{
+              overlay: {
+                backgroundColor: 'rgba(0, 0, 0, 0.5)'
+              },
+              content: {
+                width: '50%',
+                height: '40%',
+                margin: 'auto',
+                backgroundColor: 'white',
+                padding: '20px',
+                borderRadius: '8px',
+              }
+            }}
+          >
+            <div className="p-4">
+              <h1 className="text-center 2xl:text-lg:text-4xl sm:text-3xl space-y-4 drop-shadow-2xl text-slate-900 shadow-black">
+                Horario seleccionado: {daysOfWeekCompleteName[selectedDay]} {selectedTimeRange.startTime ? `${selectedTimeRange.startTime.slice(0, 5)} - ${selectedTimeRange.endTime.slice(0, 5)}` : null}
+              </h1>
+              <button onClick={handleClickReserve} className="block mx-auto mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Reservar
+              </button>
+            </div>
+          </Modal>
+            
         <Modal
-          isOpen={isModalOpen}
-          onRequestClose={() => setIsModalOpen(false)}
-          contentLabel="Editar horario"
+          isOpen={isModalCourseOpen}
+          onRequestClose={() => setIsModalCourseOpen(false)}
+          contentLabel="Editar curso"
           ariaHideApp={false}
           style={{
             overlay: {
@@ -173,7 +200,9 @@ export default function Course() {
             },
             content: {
               width: '50%',
-              height: '40%',
+              height: 'auto',
+              maxWidth: '80%',
+              maxHeight: '80%',
               margin: 'auto',
               backgroundColor: 'white',
               padding: '20px',
@@ -181,39 +210,8 @@ export default function Course() {
             }
           }}
         >
-          <div className="p-4">
-            <h1 className="text-center 2xl:text-lg:text-4xl sm:text-3xl space-y-4 drop-shadow-2xl text-slate-900 shadow-black">
-              Horario seleccionado: {daysOfWeekCompleteName[selectedDay]} {selectedTimeRange.startTime ? `${selectedTimeRange.startTime.slice(0, 5)} - ${selectedTimeRange.endTime.slice(0, 5)}` : null}
-            </h1>
-            <button onClick={handleClickReserve} className="block mx-auto mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-              Reservar
-            </button>
-          </div>
+          <ModalAddCourse closeModal={() => handleClickEditCourse()} reload={false} courseInfo={courseInfo}/>
         </Modal>
-          
-      <Modal
-        isOpen={isModalCourseOpen}
-        onRequestClose={() => setIsModalCourseOpen(false)}
-        contentLabel="Editar curso"
-        ariaHideApp={false}
-        style={{
-          overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)'
-          },
-          content: {
-            width: '50%',
-            height: 'auto',
-            maxWidth: '80%',
-            maxHeight: '80%',
-            margin: 'auto',
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '8px',
-          }
-        }}
-      >
-        <ModalAddCourse closeModal={() => handleClickEditCourse()} reload={false} courseInfo={courseInfo}/>
-      </Modal>
       </div>
   );
 }

@@ -8,6 +8,7 @@ import { categoryOptions } from '../config';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/fontawesome-free-solid';
+import { formatPrice } from '../utils';
 
 export default function Busqueda() {
   const [courses, setCourses] = useState([]);
@@ -47,11 +48,11 @@ export default function Busqueda() {
 
         if (priceRangeParam) {
           filteredCourses = filteredCourses.filter(course => {
-            if (priceRangeParam === "Menor a 5000") {
+            if (priceRangeParam === "Menor a 5.000 CLP") {
               return course.price < 5000;
-            } else if (priceRangeParam === "Entre 5000 y 10000") {
+            } else if (priceRangeParam === "Entre 5.000 y 10.000 CLP") {
               return course.price >= 5000 && course.price <= 10000;
-            } else if (priceRangeParam === "Sobre 10000") {
+            } else if (priceRangeParam === "Sobre 10.000 CLP") {
               return course.price > 10000;
             }
             return true;
@@ -96,11 +97,11 @@ export default function Busqueda() {
 
       if (selectedPriceRange && selectedPriceRange !== "Elegir rango de precios") {
         filteredCourses = filteredCourses.filter(course => {
-          if (selectedPriceRange === "Menor a 5000") {
+          if (selectedPriceRange === "Menor a 5.000 CLP") {
             return course.price < 5000;
-          } else if (selectedPriceRange === "Entre 5000 y 10000") {
+          } else if (selectedPriceRange === "Entre 5.000 y 10.000 CLP") {
             return course.price >= 5000 && course.price <= 10000;
-          } else if (selectedPriceRange === "Sobre 10000") {
+          } else if (selectedPriceRange === "Sobre 10.000 CLP") {
             return course.price > 10000;
           }
           return true;
@@ -156,7 +157,7 @@ export default function Busqueda() {
             <div className="mt-6">
               <Dropdown
                 placeholder="Elegir rango de precios"
-                options={['Elegir rango de precios','Menor a 5000', 'Entre 5000 y 10000', 'Sobre 10000']}
+                options={['Elegir rango de precios','Menor a 5.000 CLP', 'Entre 5.000 y 10.000 CLP', 'Sobre 10.000 CLP']}
                 onSelect={(option) => setSelectedPriceRange(option)}
                 className="z-10"
               />
@@ -195,7 +196,7 @@ export default function Busqueda() {
                     </h3>
                     <p className="mt-2 text-gray-600 text-3xl">{course.category}</p>
                     <p className="mt-2 text-gray-600 text-3xl">{course.description}</p>
-                    <p className="mt-2 text-gray-600 text-3xl">${course.price}</p>
+                    <p className="mt-2 text-gray-600 text-3xl">{formatPrice(course.price)}</p>
                     <p className="mt-2 text-gray-600 text-3xl">
                       Rating: {course.averageRating !== null && course.averageRating !== undefined && course.averageRating !== -1 ? (
                         <>

@@ -32,8 +32,8 @@ function Calendar({ availabilities, canEdit, functionClickOnTime, functionClickA
     const dayOfWeek = today.getDay();
     const monday = new Date(today);
     monday.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1));
-    const sunday = new Date(today);
-    sunday.setDate(today.getDate() - dayOfWeek + 7);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
 
     setCurrentWeek({ start: monday, end: sunday });
   }
@@ -81,7 +81,6 @@ function Calendar({ availabilities, canEdit, functionClickOnTime, functionClickA
     return hasHourPassed(hour, day) || hour.isAvailable === false;
   }
 
-
   return (
     <div>
       <div>Semana del {currentWeek ? `${formatDate(currentWeek.start)} - ${formatDate(currentWeek.end)}` : "Cargando..."}</div>
@@ -95,9 +94,9 @@ function Calendar({ availabilities, canEdit, functionClickOnTime, functionClickA
           <div key={index} className="bg-white-200 flex flex-col items-center py-4">
             {hours.map((hour, indexHour) => (
               <div key={indexHour} 
-                className={`py-2 px-4 rounded-full m-1 text-xs ${!isGray(hour, day)? 'bg-gray-200 shadow cursor-pointer' : 'bg-gray-100'}`}
-                style={{ width: '101px', color: !isGray(hour, day) ? 'black' : 'gray'}} 
-                onClick={() => handleClickOnTime(hour, day)}
+              className={`py-2 px-4 rounded-full m-1 text-xs ${!isGray(hour, day)? 'bg-gray-200 shadow cursor-pointer' : 'bg-gray-100'}`}
+              style={{ width: '101px', color: !isGray(hour, day) ? 'black' : 'gray'}} 
+              onClick={() => handleClickOnTime(hour, day)}
               >
                 {hour.startTime.slice(0, 5)} - {hour.endTime.slice(0, 5)}
               </div>

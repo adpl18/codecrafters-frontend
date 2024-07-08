@@ -238,9 +238,9 @@ export default function Profile() {
   const now = new Date();
   const canceledReservations = myReservations.filter(reservation => reservation.isCancelled);
   const upcomingReservations = myReservations.filter(reservation => !reservation.isCancelled
-     && new Date(`${reservation.Availability.date}T${reservation.Availability.startTime}`) > now);
+     && new Date(`${reservation.Availability?.date}T${reservation.Availability?.startTime}`) > now);
   const pastReservations = myReservations.filter(reservation => !reservation.isCancelled
-     && new Date(`${reservation.Availability.date}T${reservation.Availability.startTime}`) <= now);
+     && new Date(`${reservation.Availability?.date}T${reservation.Availability?.startTime}`) <= now);
 
   return (
     isLoading ?
@@ -330,7 +330,7 @@ export default function Profile() {
                         <div className="text-center">
                           <div className="space-y-4">
                             <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
-                            <p><span className="font-bold">Nombre alumno: </span>{reservation.User.firstName} {reservation.User.lastName}</p>
+                            <p><span className="font-bold">Nombre alumno: </span>{reservation.User?.firstName} {reservation.User?.lastName}</p>
                             <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
                             <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
                             <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>

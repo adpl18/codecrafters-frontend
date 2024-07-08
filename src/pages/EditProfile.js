@@ -5,26 +5,28 @@ import { put } from '../api/functions';
 import API from '../api/endpoints';
 
 export default function EditProfile() {
-  const [userInfo, setUserInfo] = useState({}); 
+  // const [userInfo, setUserInfo] = useState({});
+  const [name, setName] = useState('');
+  const [family_name, setFamilyName] = useState('');
+  const [birthdate, setBirthdate] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const userId = location.state?.userId;
 
-  const [name, setName] = useState(userInfo?.name || '');
-  const [family_name, setFamilyName] = useState(userInfo?.family_name || '');
-  const [birthdate, setBirthdate] = useState(userInfo?.birthdate || '');
-
   useEffect(() => {
-    fetchUserInfo();    
+    fetchUserInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
+  }, []);
 
   const fetchUserInfo = async () => {
     const accessToken = sessionStorage.getItem('accessToken');
     if (accessToken) {
       try {
         const userResponse = await getUserInfo(accessToken);
-        setUserInfo(userResponse);
+        // setUserInfo(userResponse);
+        setName(userResponse.name || '');
+        setFamilyName(userResponse.family_name || '');
+        setBirthdate(userResponse.birthdate || '');
       } catch (error) {
         navigate("/login");
       }
@@ -60,13 +62,13 @@ export default function EditProfile() {
       // Llamada al backend para actualizar usuario
       const response = await put(API.PUT_USER(userId), {
         firstName: name,
-          lastName: family_name,
-          birthdate,
+        lastName: family_name,
+        birthdate,
       })
   
       if (response.ok) {
-        const updatedUserInfo = await getUserInfo(accessToken);
-        setUserInfo(updatedUserInfo);
+        // const updatedUserInfo = await getUserInfo(accessToken);
+        // setUserInfo(updatedUserInfo);
         navigate('/profile');
       } else {
         throw new Error('Failed to update user on backend');

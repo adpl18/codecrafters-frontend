@@ -13,6 +13,8 @@ export const optionsHours = [
   { startTime: '18:00', endTime: '19:00' },
   { startTime: '19:00', endTime: '20:00' },
   { startTime: '20:00', endTime: '21:00' },
+  { startTime: '21:00', endTime: '22:00' },
+  { startTime: '22:00', endTime: '23:00' },
 ];
 
 export const daysOfWeekCompleteName = {'Lu': 'Lunes', 'Ma': 'Martes', 'Mi': 'Miércoles', 'Ju': 'Jueves', 'Vi': 'Viernes', 'Sa': 'Sábado', 'Do': 'Domingo'};

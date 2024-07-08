@@ -148,7 +148,7 @@ export default function Course() {
                   {courseInfo.User.firstName} {courseInfo.User.lastName}
                 </span>
               </p>
-              <p className="text-center text-gray-500">Precio: {courseInfo.price}</p>
+              <p className="text-center text-gray-500">Precio: ${courseInfo.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
               <p className="text-center text-gray-500">Categoría: {courseInfo.category}</p>
               <p className="text-center text-gray-500">{courseInfo.description}</p>
               <div className="flex justify-center mt-8">

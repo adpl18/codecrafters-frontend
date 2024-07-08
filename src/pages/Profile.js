@@ -30,6 +30,7 @@ export default function Profile() {
   const [reservations, setReservations] = useState([])
   const [myReservations, setMyReservations] = useState([])
   const [isTeacherView, setIsTeacherView] = useState(true);
+  const [filterOption, setFilterOption] = useState('all');
 
   useEffect(() => {
     fetchUserInfo();
@@ -40,7 +41,7 @@ export default function Profile() {
     fetchCourses();
     
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading]);
+  }, [isLoading, availabilitiesTimes]);
 
   const fetchMyReservations = async (userId) => {
     get(API.GET_RESERVATION_USER(userId))
@@ -205,11 +206,16 @@ export default function Profile() {
 
   const handleClickCancelReservation = async (reservation) => {
     await put(API.PUT_RESERVATION_CANCEL(reservation.id), {}, "Reserva cancelada correctamente");
+    await put(API.PUT_UPDATE_AVAILABILITIES(reservation.Availability.id), {isAvailable: true});
     fetchReservations(availabilitiesTimes);
   };
 
   const toggleView = () => {
     setIsTeacherView(!isTeacherView);
+  };
+
+  const handleFilterChange = (event) => {
+    setFilterOption(event.target.value);
   };
 
   const now = new Date();
@@ -283,7 +289,7 @@ export default function Profile() {
                         <div className="text-center">
                           <div className="space-y-4">
                             <p><span className="font-bold">Nombre:</span> {course.name}</p>
-                            <p><span className="font-bold">Precio:</span> {course.price}</p>
+                            <p><span className="font-bold">Precio:</span> ${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
                             <p><span className="font-bold">Descripción:</span> {course.description}</p>
                           </div>
                         </div>
@@ -300,8 +306,27 @@ export default function Profile() {
             {reservations.length > 0 ? (
               <div>
                 <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis próximas clases</h1>
+                {/* Dropdown para filtrar */}
+                <div className="flex justify-center mb-4">
+                  <select
+                    className="block w-64 py-2 px-4 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    value={filterOption}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="all">Todas</option>
+                    <option value="cancelled">Canceladas</option>
+                    <option value="notCancelled">No canceladas</option>
+                  </select>
+                </div>
                 <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
-                  {reservations.map((reservation, index) => (
+                  {reservations.filter((reservation) => {
+                      if (filterOption === 'cancelled') {
+                        return reservation.isCancelled;
+                      } else if (filterOption === 'notCancelled') {
+                        return !reservation.isCancelled;
+                      }
+                      return true; // Mostrar todas las reservas si filterOption es 'all'
+                    }).map((reservation, index) => (
                     <div key={index} className="w-1/3 mb-8">
                       <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">
                         <div className="text-center">
@@ -309,9 +334,9 @@ export default function Profile() {
                             <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
                             <p><span className="font-bold">Nombre alumno: </span>{reservation.User?.firstName} {reservation.User?.lastName}</p>
                             <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
-                            <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                            <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
                             <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
-                            <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
+                            <p><span className="font-bold">Precio: </span>${reservation.Course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
                           </div>
                         </div>
                         {!reservation.isCancelled 
@@ -335,29 +360,6 @@ export default function Profile() {
             {myReservations.length > 0 ? (
               <div>
                 <h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Mis solicitudes</h1>
-                {/* Cancelled Reservations */}
-                <div>
-                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Canceladas</h2>
-                  <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
-                    {canceledReservations.map((reservation, index) => (
-                      <div key={index} className="w-1/3 mb-8">
-                        <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">
-                          <div className="text-center">
-                            <div className="space-y-4">
-                              <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
-                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
-                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
-                              <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
-                              <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
-                            </div>
-                          </div>
-                          <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Upcoming Reservations */}
                 <div>
                   <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Próximas clases</h2>
@@ -369,9 +371,9 @@ export default function Profile() {
                             <div className="space-y-4">
                               <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
                               <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
-                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
                               <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
-                              <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
+                              <p><span className="font-bold">Precio: </span>${reservation.Course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
                             </div>
                           </div>
                           {!reservation.isCancelled 
@@ -386,6 +388,30 @@ export default function Profile() {
                   </div>
                 </div>
 
+                {/* Cancelled Reservations */}
+                <div>
+                  <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Canceladas</h2>
+                  <div className="flex flex-wrap justify-center text-center space-x-4 p-10">
+                    {canceledReservations.map((reservation, index) => (
+                      <div key={index} className="w-1/3 mb-8">
+                        <div className="bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl h-full">
+                          <div className="text-center">
+                            <div className="space-y-4">
+                              <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
+                              <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
+                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
+                              <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
+                              <p><span className="font-bold">Precio: </span>${reservation.Course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
+                            </div>
+                          </div>
+                          <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Reserva cancelada</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+
                 {/* Past Reservations */}
                 <div>
                   <h2 className="text-2xl font-bold text-center text-gray-700 mb-2">Clases que asististe</h2>
@@ -397,9 +423,9 @@ export default function Profile() {
                             <div className="space-y-4">
                               <p><span className="font-bold">Número de reserva: </span>{reservation.id}</p>
                               <p><span className="font-bold">Fecha reserva: </span>{reservation.Availability.date}</p>
-                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime} - {reservation.Availability.endTime}</p>
+                              <p><span className="font-bold">Horario reserva: </span>{reservation.Availability.startTime.split(':').slice(0, 2).join(':')} - {reservation.Availability.endTime.split(':').slice(0, 2).join(':')}</p>
                               <p><span className="font-bold">Curso: </span>{reservation.Course.name}</p>
-                              <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
+                              <p><span className="font-bold">Precio: </span>${reservation.Course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} CLP</p>
                             </div>
                           </div>
                         </div>

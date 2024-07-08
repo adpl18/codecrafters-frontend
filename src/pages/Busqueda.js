@@ -6,6 +6,8 @@ import API from '../api/endpoints';
 import profileIcon from "../assets/images/user.png";
 import { categoryOptions } from '../config';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/fontawesome-free-solid';
 
 export default function Busqueda() {
   const [courses, setCourses] = useState([]);
@@ -57,8 +59,17 @@ export default function Busqueda() {
         }
 
         setCourses(filteredCourses);
+
+        const coursesWithRatings = await Promise.all(
+          filteredCourses.map(async (course) => {
+            const ratingData = await get(API.GET_COURSE_AVG_RATING(course.id));
+            return { ...course, averageRating: ratingData.averageRating };
+          })
+        );
+
+        setCourses(coursesWithRatings);
       } catch (err) {
-        setError("Error fetching courses");
+        setError(err.message);
       }
     };
 
@@ -97,6 +108,15 @@ export default function Busqueda() {
       }
 
       setCourses(filteredCourses);
+
+      const coursesWithRatings = await Promise.all(
+        filteredCourses.map(async (course) => {
+          const ratingData = await get(API.GET_COURSE_AVG_RATING(course.id));
+          return { ...course, averageRating: ratingData.averageRating };
+        })
+      );
+
+      setCourses(coursesWithRatings);
     } catch (err) {
       setError("Error fetching courses");
     }
@@ -176,6 +196,15 @@ export default function Busqueda() {
                     <p className="mt-2 text-gray-600 text-3xl">{course.category}</p>
                     <p className="mt-2 text-gray-600 text-3xl">{course.description}</p>
                     <p className="mt-2 text-gray-600 text-3xl">${course.price}</p>
+                    <p className="mt-2 text-gray-600 text-3xl">
+                      Rating: {course.averageRating !== null && course.averageRating !== undefined && course.averageRating !== -1 ? (
+                        <>
+                          {course.averageRating.toFixed(1)} <FontAwesomeIcon icon={faStar}/>
+                        </>
+                      ) : (
+                        "S/R" // Sin Rating Definido
+                      )}
+                    </p>
                   </div>
                 </div>
               ))}

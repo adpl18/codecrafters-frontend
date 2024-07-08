@@ -32,8 +32,8 @@ function Calendar({ availabilities, canEdit, functionClickOnTime, functionClickA
     const dayOfWeek = today.getDay();
     const monday = new Date(today);
     monday.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1));
-    const sunday = new Date(today);
-    sunday.setDate(today.getDate() - dayOfWeek + 7);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
 
     setCurrentWeek({ start: monday, end: sunday });
   }

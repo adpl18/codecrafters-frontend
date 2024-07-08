@@ -8,7 +8,7 @@ const ToggleButton = ({ isTeacherView, toggleView }) => {
         onClick={() => toggleView(true)}
         className={`py-2 px-4 font-bold rounded-full focus:outline-none focus:shadow-outline mx-2 ${isTeacherView ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
       >
-        Vista profesor
+        Vista Profesor
       </button>
       <button
         onClick={() => toggleView(false)}

@@ -375,12 +375,6 @@ export default function Profile() {
                               <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
                             </div>
                           </div>
-                          {/* {!reservation.isReviewed 
-                            ? <button onClick={() => handleOpenReviewModal(reservation)} className="w-full py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mb-4">
-                                Dejar reseña
-                              </button>
-                            : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Ya dejaste reseña</div> 
-                          } */}
                         </div>
                       </div>
                     ))}

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import API from '../api/endpoints';
 import { get } from '../api/functions';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/fontawesome-free-solid';
 
 export default function TeacherProfile() {
   const { userId } = useParams();
@@ -31,7 +33,13 @@ export default function TeacherProfile() {
   const fetchCourses = async (userId) => {
     try {
       const response = await get(API.GET_COURSES_USER(userId));
-      setCourses(response.courses);
+      const coursesWithRatings = await Promise.all(
+        response.courses.map(async (course) => {
+          const ratingData = await get(API.GET_COURSE_AVG_RATING(course.id));
+          return { ...course, averageRating: ratingData.averageRating };
+        })
+      );
+      setCourses(coursesWithRatings);
     } catch (error) {
       console.error(error);
     }
@@ -61,6 +69,14 @@ export default function TeacherProfile() {
                       <p><span className="font-bold">Nombre:</span> {course.name}</p>
                       <p><span className="font-bold">Precio:</span> {course.price}</p>
                       <p><span className="font-bold">Descripción:</span> {course.description}</p>
+                      <p><span className="font-bold">Rating:</span> {course.averageRating !== null && course.averageRating !== undefined && course.averageRating !== -1 ? (
+                        <>
+                          {course.averageRating.toFixed(1)} <FontAwesomeIcon icon={faStar} />
+                        </>
+                      ) : (
+                        "S/R"
+                      )}
+                      </p>
                     </div>
                   </div>
                 </div>

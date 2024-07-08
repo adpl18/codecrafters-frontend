@@ -10,7 +10,8 @@ import { optionsHours, daysOfWeekCompleteName } from '../config';
 import Login from './Login';
 import { logout } from '../auth/authService';
 import Calendar from '../components/calendar';
-import ToggleButton from '../components/toggleButton'; 
+import ToggleButton from '../components/toggleButton';
+import StarRating from '../components/starRating';
 
 export default function Profile() {
   const [userInfo, setUserInfo] = useState(null);
@@ -30,6 +31,10 @@ export default function Profile() {
   const [reservations, setReservations] = useState([])
   const [myReservations, setMyReservations] = useState([])
   const [isTeacherView, setIsTeacherView] = useState(true);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
 
   useEffect(() => {
     fetchUserInfo();
@@ -208,8 +213,26 @@ export default function Profile() {
     fetchReservations(availabilitiesTimes);
   };
 
+  const handleReviewSubmit = async () => {
+    const review = {
+      reservationId: selectedReservation.id,
+      rating: reviewRating,
+      comment: reviewComment,
+    };
+
+    await put(API.PUT_RESERVATION_REVIEWED(selectedReservation.id), {}, "Reserva marcada como revisada");
+    await post(API.POST_REVIEW(), review, "Reseña guardada correctamente");
+    setIsReviewModalOpen(false);
+    fetchMyReservations(backendUserInfo.id);
+  };
+
   const toggleView = () => {
     setIsTeacherView(!isTeacherView);
+  };
+
+  const handleOpenReviewModal = (reservation) => {
+    setSelectedReservation(reservation);
+    setIsReviewModalOpen(true);
   };
 
   const now = new Date();
@@ -402,6 +425,12 @@ export default function Profile() {
                               <p><span className="font-bold">Precio: </span>{reservation.Course.price}</p>
                             </div>
                           </div>
+                          {!reservation.isReviewed 
+                            ? <button onClick={() => handleOpenReviewModal(reservation)} className="w-full py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full focus:outline-none focus:shadow-outline mb-4">
+                                Dejar reseña
+                              </button>
+                            : <div className="w-full py-2 font-bold rounded-full focus:outline-none focus:shadow-outline mt-4">Ya dejaste reseña</div> 
+                          }
                         </div>
                       </div>
                     ))}
@@ -484,6 +513,18 @@ export default function Profile() {
           </button>
         </div>
       </Modal>
+      <Modal isOpen={isReviewModalOpen} onRequestClose={() => setIsReviewModalOpen(false)}>
+      <h2>Dejar Reseña</h2>
+      <StarRating rating={reviewRating} onRatingChange={setReviewRating} />
+      <textarea
+        value={reviewComment}
+        onChange={(e) => setReviewComment(e.target.value)}
+        placeholder="Escribe tu comentario aquí"
+        className="w-full p-2 border rounded mb-4"
+      />
+      <button onClick={handleReviewSubmit} className="bg-blue-500 text-white px-4 py-2 rounded">Enviar Reseña</button>
+      <button onClick={() => setIsReviewModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded ml-4">Cancelar</button>
+    </Modal>
     </div>
     : <Login />
   );
